@@ -38,10 +38,10 @@ interface ToolbarProps {
 
 // Shared control styles so every element has the same height and look
 const controlBase =
-  'h-9 text-xs rounded-md border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 px-2.5 focus:outline-none focus:ring-2 focus:ring-neutral-900/10 dark:focus:ring-white/20 transition-colors';
+  'h-9 min-w-0 text-xs rounded-md border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 px-2.5 focus:outline-none focus:ring-2 focus:ring-neutral-900/10 dark:focus:ring-white/20 transition-colors truncate';
 
 const ghostBtn =
-  'h-9 px-2.5 text-xs text-neutral-600 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-md border border-neutral-200 dark:border-neutral-700 flex items-center justify-center gap-1.5 transition-colors';
+  'h-9 min-w-0 px-2.5 text-xs text-neutral-600 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-md border border-neutral-200 dark:border-neutral-700 flex items-center justify-center gap-1.5 transition-colors';
 
 export const Toolbar: React.FC<ToolbarProps> = ({
   quote,
@@ -114,7 +114,11 @@ export const Toolbar: React.FC<ToolbarProps> = ({
   return (
     <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-3 shadow-xs no-print transition-colors">
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-        {/* Left: Template, Colors, Currency, Website Language */}
+        {/*
+          Left group: Template, Colors, Currency, Website Language
+          - < sm  : 2-column grid  (template full, palette full, currency | language)
+          - sm+   : single wrapping row
+        */}
         <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center">
           {/* Template Selector */}
           <select
@@ -136,9 +140,9 @@ export const Toolbar: React.FC<ToolbarProps> = ({
           </select>
 
           {/* Accent Color Palette */}
-          <div className="col-span-2 h-9 flex items-center justify-between sm:justify-start gap-1.5 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-md px-2.5 sm:col-span-1">
+          <div className="col-span-2 h-9 flex items-center gap-2 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-md px-2.5 sm:col-span-1">
             <Palette className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
-            <div className="flex items-center gap-1.5">
+            <div className="flex flex-1 items-center justify-between gap-1.5 sm:flex-none sm:justify-start">
               {ACCENT_COLORS.map((color) => (
                 <button
                   key={color.id}
@@ -191,18 +195,22 @@ export const Toolbar: React.FC<ToolbarProps> = ({
           </select>
         </div>
 
-        {/* Right: History, New, Print, Download */}
-        <div className="grid grid-cols-[2.25rem_2.25rem_1fr_1fr] gap-2 border-t border-neutral-100 dark:border-neutral-800 pt-3 sm:flex sm:flex-wrap sm:items-center sm:justify-end lg:border-t-0 lg:pt-0">
+        {/*
+          Right group: History, New, Print, Download
+          - < sm  : 2x2 grid (History | New  /  Print | Download), all labels visible
+          - sm+   : single wrapping row, right-aligned
+        */}
+        <div className="grid grid-cols-2 gap-2 border-t border-neutral-100 dark:border-neutral-800 pt-3 sm:flex sm:flex-wrap sm:items-center sm:justify-end lg:border-t-0 lg:pt-0">
           {/* History */}
           <button
             type="button"
             onClick={openHistory}
             title={ui.savedDraftsTitle}
             aria-label={ui.btnHistory}
-            className={`${ghostBtn} px-0 sm:px-2.5`}
+            className={ghostBtn}
           >
-            <History className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">{ui.btnHistory}</span>
+            <History className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">{ui.btnHistory}</span>
           </button>
 
           {/* New Quote */}
@@ -211,20 +219,20 @@ export const Toolbar: React.FC<ToolbarProps> = ({
             onClick={() => setShowNewQuoteModal(true)}
             title="Start New Quote"
             aria-label={ui.btnNew}
-            className={`${ghostBtn} px-0 sm:px-2.5`}
+            className={ghostBtn}
           >
-            <FilePlus className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">{ui.btnNew}</span>
+            <FilePlus className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">{ui.btnNew}</span>
           </button>
 
           {/* Print */}
           <button
             type="button"
             onClick={printQuote}
-            className="h-9 px-3 text-xs font-medium text-neutral-800 dark:text-neutral-200 bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded-md flex items-center justify-center gap-1.5 transition-colors"
+            className="h-9 min-w-0 px-3 text-xs font-medium text-neutral-800 dark:text-neutral-200 bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 border border-neutral-200 dark:border-neutral-700 sm:border-transparent rounded-md flex items-center justify-center gap-1.5 transition-colors"
           >
-            <Printer className="w-3.5 h-3.5" />
-            <span>{ui.btnPrint}</span>
+            <Printer className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">{ui.btnPrint}</span>
           </button>
 
           {/* Primary Download CTA */}
@@ -232,10 +240,10 @@ export const Toolbar: React.FC<ToolbarProps> = ({
             type="button"
             onClick={handleDownload}
             disabled={isExporting}
-            className="h-9 px-4 text-xs font-semibold text-white dark:text-neutral-900 bg-neutral-900 dark:bg-white hover:bg-neutral-800 dark:hover:bg-neutral-100 disabled:opacity-50 rounded-full flex items-center justify-center gap-1.5 transition-colors shadow-xs whitespace-nowrap"
+            className="h-9 min-w-0 px-3 sm:px-4 text-xs font-semibold text-white dark:text-neutral-900 bg-neutral-900 dark:bg-white hover:bg-neutral-800 dark:hover:bg-neutral-100 disabled:opacity-50 rounded-full flex items-center justify-center gap-1.5 transition-colors shadow-xs"
           >
-            <Download className="w-3.5 h-3.5" />
-            <span>{isExporting ? ui.generatingPdf : ui.btnDownloadPdf}</span>
+            <Download className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">{isExporting ? ui.generatingPdf : ui.btnDownloadPdf}</span>
           </button>
         </div>
       </div>
