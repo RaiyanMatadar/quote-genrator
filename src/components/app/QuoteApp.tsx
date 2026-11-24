@@ -37,7 +37,7 @@ export const QuoteApp: React.FC = () => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
   }, []);
 
-  // Hydrate client-side state on mount
+  // Hydrate client-side state on mount & synchronize global language
   useEffect(() => {
     setIsClient(true);
 
@@ -53,6 +53,18 @@ export const QuoteApp: React.FC = () => {
     if (storedLang) {
       setSiteLanguage(storedLang);
     }
+
+    // 3. Listen for global language changes from Navbar
+    const handleGlobalLang = (e: any) => {
+      const lang = e.detail?.lang;
+      if (lang) {
+        setSiteLanguage(lang);
+      }
+    };
+    window.addEventListener('site-language-changed', handleGlobalLang);
+    return () => {
+      window.removeEventListener('site-language-changed', handleGlobalLang);
+    };
   }, []);
 
   // Debounced auto-save to localStorage on quote updates
@@ -68,11 +80,12 @@ export const QuoteApp: React.FC = () => {
     return () => clearTimeout(timer);
   }, [quote, isClient]);
 
-  // Handle website UI language switch
+  // Handle website UI language switch (does NOT modify quotation content)
   const handleSiteLanguageChange = (newLang: string) => {
     setSiteLanguage(newLang);
     try {
       localStorage.setItem('site_language', newLang);
+      window.dispatchEvent(new CustomEvent('site-language-changed', { detail: { lang: newLang } }));
       addToast('Website language updated', 'info');
     } catch {}
   };

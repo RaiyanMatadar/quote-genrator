@@ -190,3 +190,14 @@ export function loadQuoteFromHistory(id: string): QuoteData | null {
   }
   return null;
 }
+
+export function deleteQuoteFromHistory(id: string): void {
+  if (typeof window === 'undefined' || !window.localStorage) return;
+  try {
+    const history = getHistoryList().filter((h) => h.id !== id);
+    localStorage.setItem(HISTORY_LIST_KEY, JSON.stringify(history));
+    localStorage.removeItem(`quote_draft_${id}`);
+  } catch (e) {
+    console.warn('Failed to delete quote from history:', e);
+  }
+}

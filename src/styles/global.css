@@ -60,6 +60,9 @@ html.dark body {
 
 /* Modern Cross-Browser Select and Option Styling */
 select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
   background-color: var(--color-canvas-elevated);
   color: var(--color-ink);
   border: 1px solid var(--color-hairline);
@@ -68,54 +71,81 @@ select {
   font-size: 0.75rem;
   line-height: 1.25rem;
   font-weight: 500;
+  font-family: var(--font-sans);
   cursor: pointer;
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23737373' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
   background-position: right 0.5rem center;
   background-repeat: no-repeat;
   background-size: 1.15em 1.15em;
-  transition: all 0.15s ease-in-out;
+  box-sizing: border-box;
+  transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 select:hover {
-  border-color: #a3a3a3;
-  background-color: #f5f5f5;
+  border-color: #8f8f8f;
+  background-color: #f7f7f8;
 }
 
 select:focus {
-  outline: none;
+  outline: 2px solid transparent;
+  outline-offset: 2px;
   border-color: var(--color-ink);
   box-shadow: 0 0 0 1px var(--color-ink);
 }
 
-.dark select {
+select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.dark select,
+html.dark select {
   background-color: #18181b;
   color: #f4f4f5;
   border-color: #27272a;
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23a1a1aa' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
 }
 
-.dark select:hover {
+.dark select:hover,
+html.dark select:hover {
   border-color: #3f3f46;
-  background-color: #27272a;
+  background-color: #202024;
 }
 
-.dark select:focus {
+.dark select:focus,
+html.dark select:focus {
   border-color: #f4f4f5;
   box-shadow: 0 0 0 1px #f4f4f5;
 }
 
+/* Cross-browser styling for options dropdown menu */
 select option {
   background-color: #ffffff;
   color: #171717;
   padding: 0.5rem 0.75rem;
   font-size: 0.75rem;
+  font-family: var(--font-sans);
 }
 
-.dark select option {
+select option:checked {
+  background-color: #f4f4f5;
+  font-weight: 600;
+}
+
+.dark select option,
+html.dark select option {
   background-color: #18181b;
   color: #f4f4f5;
   padding: 0.5rem 0.75rem;
   font-size: 0.75rem;
+  font-family: var(--font-sans);
+}
+
+.dark select option:checked,
+html.dark select option:checked {
+  background-color: #27272a;
+  color: #ffffff;
 }
 
 /* Vercel Mesh Gradient for Hero */

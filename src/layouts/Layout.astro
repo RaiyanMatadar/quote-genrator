@@ -48,7 +48,7 @@ const jsonLd = {
     <link rel="icon" href="/favicon.ico" />
     <meta name="generator" content={Astro.generator} />
 
-    <!-- Instant Dark Mode Detection Script (Prevents FOUC) -->
+    <!-- Instant Dark Mode & Language Detection Script (Prevents FOUC) -->
     <script is:inline>
       (function() {
         try {
@@ -70,8 +70,18 @@ const jsonLd = {
               }
             }
           });
+
+          // Set initial website language and direction
+          const storedLang = localStorage.getItem('site_language') || 'en';
+          document.documentElement.lang = storedLang;
+          document.documentElement.dir = storedLang === 'ar' ? 'rtl' : 'ltr';
         } catch (e) {}
       })();
+    </script>
+
+    <!-- Client-side global i18n orchestrator -->
+    <script>
+      import '../scripts/i18n';
     </script>
 
     <!-- SEO Meta Tags -->

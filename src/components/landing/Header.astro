@@ -1,5 +1,6 @@
 ---
 // src/components/landing/Header.astro
+import { SUPPORTED_LANGUAGES } from '../../data/translations';
 ---
 
 <header class="sticky top-0 z-40 w-full bg-white/80 dark:bg-[#09090b]/80 backdrop-blur-md border-b border-neutral-200/80 dark:border-neutral-800/80 transition-colors no-print">
@@ -10,21 +11,43 @@
         Q
       </div>
       <div class="flex items-center gap-1.5">
-        <span class="font-bold text-xs sm:text-sm tracking-tight text-neutral-950 dark:text-neutral-50 truncate max-w-[140px] sm:max-w-none">Quote Generator Free</span>
-        <span class="hidden sm:inline text-[10px] font-mono uppercase bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 px-1.5 py-0.5 rounded font-medium">Free</span>
+        <span data-i18n="brandName" class="font-bold text-xs sm:text-sm tracking-tight text-neutral-950 dark:text-neutral-50 truncate max-w-[130px] sm:max-w-none">Quote Generator Free</span>
+        <span data-i18n="badgeFree" class="hidden sm:inline text-[10px] font-mono uppercase bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 px-1.5 py-0.5 rounded font-medium">Free</span>
       </div>
     </a>
 
     <!-- Nav Links (Desktop) -->
     <nav class="hidden md:flex items-center gap-6 text-xs text-neutral-600 dark:text-neutral-400">
-      <a href="#editor" class="hover:text-neutral-950 dark:hover:text-neutral-50 transition-colors">Generator</a>
-      <a href="#features" class="hover:text-neutral-950 dark:hover:text-neutral-50 transition-colors">Features</a>
-      <a href="#templates" class="hover:text-neutral-950 dark:hover:text-neutral-50 transition-colors">Templates</a>
-      <a href="#faq" class="hover:text-neutral-950 dark:hover:text-neutral-50 transition-colors">FAQ</a>
+      <a href="#editor" data-i18n="navGenerator" class="hover:text-neutral-950 dark:hover:text-neutral-50 transition-colors">Generator</a>
+      <a href="#features" data-i18n="navFeatures" class="hover:text-neutral-950 dark:hover:text-neutral-50 transition-colors">Features</a>
+      <a href="#templates" data-i18n="navTemplates" class="hover:text-neutral-950 dark:hover:text-neutral-50 transition-colors">Templates</a>
+      <a href="#faq" data-i18n="navFaq" class="hover:text-neutral-950 dark:hover:text-neutral-50 transition-colors">FAQ</a>
     </nav>
 
-    <!-- Right Controls: Theme Toggle & Compact Mobile Create Quote Button -->
+    <!-- Right Controls: Global Language Selector, Theme Toggle & Compact Create Quote Button -->
     <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+      <!-- Global Website Language Selector -->
+      <div class="relative flex items-center">
+        <label for="global-lang-select" class="sr-only">Select Website Language</label>
+        <div class="relative flex items-center">
+          <svg class="w-3.5 h-3.5 text-neutral-500 dark:text-neutral-400 pointer-events-none absolute left-2 z-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+          </svg>
+          <select
+            id="global-lang-select"
+            aria-label="Select Website Language"
+            title="Website Language"
+            class="pl-7 pr-7 py-1 text-[11px] sm:text-xs font-medium text-neutral-700 dark:text-neutral-300 bg-neutral-100/60 dark:bg-neutral-800/60 hover:bg-neutral-100 dark:hover:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-md cursor-pointer transition-colors focus:ring-1 focus:ring-neutral-900 dark:focus:ring-neutral-100"
+          >
+            {SUPPORTED_LANGUAGES.map((lang) => (
+              <option value={lang.code}>
+                {lang.nativeName}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
       <!-- Dark/Light Theme Toggle -->
       <button
         id="theme-toggle-btn"
@@ -48,8 +71,8 @@
         href="#editor"
         class="inline-flex items-center justify-center px-2.5 sm:px-4 py-1 sm:py-1.5 text-[11px] sm:text-xs font-semibold text-white dark:text-neutral-900 bg-neutral-900 dark:bg-white hover:bg-neutral-800 dark:hover:bg-neutral-100 rounded-full transition-colors shadow-2xs whitespace-nowrap leading-none"
       >
-        <span class="sm:hidden">Create</span>
-        <span class="hidden sm:inline">Create Quote</span>
+        <span data-i18n="btnCreateQuote" class="sm:hidden">Create</span>
+        <span data-i18n="btnCreateQuote" class="hidden sm:inline">Create Quote</span>
       </a>
     </div>
   </div>

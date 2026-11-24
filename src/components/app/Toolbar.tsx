@@ -10,13 +10,19 @@ import {
   FilePlus,
   History,
   Palette,
-  Check
+  Check,
+  FileText,
+  ArrowRight,
+  Trash2,
+  Clock,
+  X
 } from 'lucide-react';
 import { downloadQuotePDF, printQuote } from '../../utils/pdfExporter';
 import {
   saveToHistory,
   getHistoryList,
-  loadQuoteFromHistory
+  loadQuoteFromHistory,
+  deleteQuoteFromHistory
 } from '../../utils/storage';
 import { ModernModal } from '../ui/ModernModal';
 
@@ -77,6 +83,15 @@ export const Toolbar: React.FC<ToolbarProps> = ({
       if (onNotify) {
         onNotify(`Restored draft ${loaded.meta.quoteNumber}`, 'info');
       }
+    }
+  };
+
+  const handleDeleteDraft = (id: string) => {
+    deleteQuoteFromHistory(id);
+    const updated = getHistoryList();
+    setSavedDrafts(updated);
+    if (onNotify) {
+      onNotify('Quotation draft removed from history', 'info');
     }
   };
 
@@ -222,57 +237,139 @@ export const Toolbar: React.FC<ToolbarProps> = ({
         onCancel={() => setShowNewQuoteModal(false)}
       />
 
-      {/* Modern History Modal */}
+      {/* Modern Interactive History Modal with Clickable Cards */}
       {showHistoryModal && (
-        <div className="fixed inset-0 z-50 bg-neutral-950/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 p-5 max-w-md w-full shadow-2xl space-y-4">
-            <div className="flex items-center justify-between border-b border-neutral-100 dark:border-neutral-800 pb-3">
-              <h3 className="font-semibold text-sm text-neutral-900 dark:text-white flex items-center gap-2">
-                <History className="w-4 h-4" /> {ui.savedDraftsTitle}
-              </h3>
+        <div 
+          className="fixed inset-0 z-50 bg-neutral-950/60 backdrop-blur-xs flex items-center justify-center p-4 transition-opacity animate-in fade-in duration-150"
+          onClick={() => setShowHistoryModal(false)}
+        >
+          <div 
+            className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 p-5 sm:p-6 max-w-lg w-full shadow-2xl space-y-4 max-h-[85vh] flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="flex items-start justify-between border-b border-neutral-100 dark:border-neutral-800 pb-3">
+              <div>
+                <h3 className="font-semibold text-base text-neutral-950 dark:text-white flex items-center gap-2">
+                  <History className="w-4 h-4 text-neutral-900 dark:text-white" />
+                  {ui.savedDraftsTitle || 'Quotation History'}
+                </h3>
+                <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
+                  {ui.savedDraftsSubtitle || 'Select any quotation below to load and continue editing.'}
+                </p>
+              </div>
               <button
                 type="button"
                 onClick={() => setShowHistoryModal(false)}
-                className="text-neutral-400 hover:text-neutral-900 dark:hover:text-white text-sm p-1 rounded"
+                className="text-neutral-400 hover:text-neutral-900 dark:hover:text-white p-1 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+                aria-label="Close"
               >
-                ✕
+                <X className="w-4 h-4" />
               </button>
             </div>
 
-            <div className="max-h-72 overflow-y-auto divide-y divide-neutral-100 dark:divide-neutral-800 text-xs">
+            {/* Clickable Draft Cards List */}
+            <div className="overflow-y-auto flex-1 pr-1 space-y-2.5">
               {savedDrafts.length === 0 ? (
-                <p className="text-neutral-400 text-center py-6">{ui.noDrafts}</p>
-              ) : (
-                savedDrafts.map((draft) => (
-                  <div
-                    key={draft.id}
-                    className="py-2.5 flex items-center justify-between hover:bg-neutral-50 dark:hover:bg-neutral-800/50 px-2 rounded cursor-pointer transition-colors"
-                    onClick={() => restoreDraft(draft.id)}
-                  >
-                    <div>
-                      <p className="font-mono font-semibold text-neutral-900 dark:text-white">{draft.quoteNumber}</p>
-                      <p className="text-neutral-500 dark:text-neutral-400 text-[11px]">{draft.clientName}</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-mono font-medium text-neutral-900 dark:text-white">
-                        {draft.currency} {draft.total}
-                      </p>
-                      <p className="text-[10px] text-neutral-400">
-                        {new Date(draft.lastUpdated).toLocaleDateString()}
-                      </p>
-                    </div>
+                <div className="py-12 text-center space-y-2.5">
+                  <div className="w-11 h-11 mx-auto rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-400 dark:text-neutral-500">
+                    <History className="w-5 h-5" />
                   </div>
-                ))
+                  <p className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                    {ui.noDrafts || 'No saved quotations found'}
+                  </p>
+                  <p className="text-[11px] text-neutral-400 dark:text-neutral-500 max-w-xs mx-auto leading-relaxed">
+                    Quotations are automatically saved here as you work, download, or create new quotes.
+                  </p>
+                </div>
+              ) : (
+                savedDrafts.map((draft) => {
+                  const isActive = draft.id === quote.id;
+                  const formattedDate = new Date(draft.lastUpdated).toLocaleDateString(undefined, {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric'
+                  });
+
+                  return (
+                    <div
+                      key={draft.id}
+                      onClick={() => restoreDraft(draft.id)}
+                      className={`group relative p-3.5 rounded-xl border transition-all duration-150 cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
+                        isActive
+                          ? 'bg-neutral-50/90 dark:bg-neutral-800/90 border-neutral-900 dark:border-white shadow-xs ring-1 ring-neutral-900/10 dark:ring-white/20'
+                          : 'bg-white dark:bg-neutral-900/80 border-neutral-200 dark:border-neutral-800 hover:border-neutral-400 dark:hover:border-neutral-600 hover:shadow-md hover:bg-neutral-50/60 dark:hover:bg-neutral-800/60'
+                      }`}
+                    >
+                      {/* Left: Document Info */}
+                      <div className="flex items-start gap-3 min-w-0">
+                        <div className="p-2 rounded-lg bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 group-hover:bg-neutral-900 group-hover:text-white dark:group-hover:bg-white dark:group-hover:text-neutral-900 transition-colors shrink-0">
+                          <FileText className="w-4 h-4" />
+                        </div>
+                        <div className="space-y-0.5 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="font-mono font-bold text-xs text-neutral-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                              {draft.quoteNumber}
+                            </span>
+                            {isActive && (
+                              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 shrink-0">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                {ui.activeDraft || 'Active'}
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-neutral-600 dark:text-neutral-300 text-[11px] font-medium truncate max-w-[200px] sm:max-w-[240px]">
+                            {draft.clientName || 'Unnamed Client'}
+                          </p>
+                          <div className="flex items-center gap-1 text-[10px] text-neutral-400 dark:text-neutral-500 pt-0.5">
+                            <Clock className="w-3 h-3" />
+                            <span>{formattedDate}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Right: Total & Interactive Action */}
+                      <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-2 shrink-0 border-t sm:border-t-0 pt-2 sm:pt-0 border-neutral-100 dark:border-neutral-800/80">
+                        <div className="text-left sm:text-right">
+                          <span className="text-[10px] text-neutral-400 uppercase tracking-wider block font-mono">
+                            Total
+                          </span>
+                          <span className="font-mono font-bold text-xs sm:text-sm text-neutral-950 dark:text-white">
+                            {draft.currency} {Number(draft.total || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-semibold bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 group-hover:bg-neutral-900 group-hover:text-white dark:group-hover:bg-white dark:group-hover:text-neutral-900 transition-all">
+                            {isActive ? 'Current' : (ui.openQuote || 'Open Quote')}
+                            <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
+                          </span>
+                          <button
+                            type="button"
+                            title={ui.deleteDraft || 'Delete draft'}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteDraft(draft.id);
+                            }}
+                            className="p-1 text-neutral-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 rounded-md transition-colors"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
               )}
             </div>
 
-            <div className="pt-2 border-t border-neutral-100 dark:border-neutral-800 flex justify-end">
+            {/* Modal Footer */}
+            <div className="pt-3 border-t border-neutral-100 dark:border-neutral-800 flex justify-end">
               <button
                 type="button"
                 onClick={() => setShowHistoryModal(false)}
-                className="px-3.5 py-1.5 text-xs font-medium text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white border border-neutral-200 dark:border-neutral-700 rounded-md transition-colors"
+                className="px-4 py-1.5 text-xs font-semibold text-neutral-700 dark:text-neutral-300 hover:text-neutral-950 dark:hover:text-white bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded-md transition-colors"
               >
-                {ui.close}
+                {ui.close || 'Close'}
               </button>
             </div>
           </div>
