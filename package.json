@@ -20,6 +20,7 @@
     "astro": "^7.4.13",
     "canvas-confetti": "^1.9.4",
     "html2canvas": "^1.4.1",
+    "html2canvas-pro": "^2.6.4",
     "jspdf": "^4.2.1",
     "lucide-react": "^1.79.0",
     "react": "^19.3.1",

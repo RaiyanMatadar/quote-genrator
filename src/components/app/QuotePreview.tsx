@@ -5,8 +5,7 @@ import { CorporateTemplate } from './templates/CorporateTemplate';
 import { CreativeTemplate } from './templates/CreativeTemplate';
 import { NordicTemplate } from './templates/NordicTemplate';
 import { CompactTemplate } from './templates/CompactTemplate';
-import { ZoomIn, ZoomOut, Maximize2, Download, Printer } from 'lucide-react';
-import { downloadQuotePDF, printQuote } from '../../utils/pdfExporter';
+import { ZoomIn, ZoomOut, Maximize2 } from 'lucide-react';
 import type { SiteUiDictionary } from '../../data/uiTranslations';
 
 interface QuotePreviewProps {
@@ -17,7 +16,6 @@ interface QuotePreviewProps {
 export const QuotePreview: React.FC<QuotePreviewProps> = ({ quote, ui }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [zoomLevel, setZoomLevel] = useState<number>(0.85);
-  const [isExporting, setIsExporting] = useState<boolean>(false);
   const a4WidthPx = 794; // 210mm at 96 DPI
   const a4HeightPx = 1123; // 297mm
 
@@ -48,15 +46,14 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({ quote, ui }) => {
     }
   };
 
-  const handleDownload = async () => {
-    setIsExporting(true);
-    try {
-      await downloadQuotePDF('quotation-print-target', quote.meta.quoteNumber);
-    } catch (err: any) {
-      console.error('PDF download error:', err);
-      alert(`Unable to generate PDF (${err.message || 'Error'}). You can also click the Print button to save as PDF.`);
-    } finally {
-      setIsExporting(false);
+  // Toggle between Fit and 100% zoom on desktop click
+  const handleDesktopClickZoom = () => {
+    if (window.innerWidth >= 1024) {
+      if (zoomLevel >= 1) {
+        handleFitWidth();
+      } else {
+        setZoomLevel(1);
+      }
     }
   };
 
@@ -81,8 +78,8 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({ quote, ui }) => {
 
   return (
     <div className="flex flex-col h-full bg-neutral-100 dark:bg-neutral-900/60 rounded-xl border border-neutral-200 dark:border-neutral-800 overflow-hidden shadow-xs transition-colors">
-      {/* Preview Header & Controls */}
-      <div className="bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800 px-3 sm:px-4 py-2.5 flex flex-wrap items-center justify-between gap-2 no-print">
+      {/* Preview Header & Controls (Cleaned: duplicate Print & Download buttons removed) */}
+      <div className="bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800 px-3 sm:px-4 py-2.5 flex items-center justify-between no-print">
         <div className="flex items-center gap-2">
           <span className="text-xs font-mono font-medium text-neutral-600 dark:text-neutral-300 uppercase tracking-wider">
             {ui.livePreview}
@@ -92,7 +89,7 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({ quote, ui }) => {
           </span>
         </div>
 
-        {/* Zoom & Quick Actions */}
+        {/* Viewport Zoom Controls */}
         <div className="flex items-center gap-1 sm:gap-1.5">
           <button
             type="button"
@@ -118,44 +115,29 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({ quote, ui }) => {
           >
             <ZoomIn className="w-3.5 h-3.5" />
           </button>
-
-          <div className="h-4 w-px bg-neutral-200 dark:bg-neutral-700 mx-1" />
-
-          <button
-            type="button"
-            onClick={printQuote}
-            title={ui.btnPrint}
-            className="px-2.5 py-1 text-xs font-medium text-neutral-700 dark:text-neutral-300 bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded-md flex items-center gap-1 transition-colors"
-          >
-            <Printer className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">{ui.btnPrint}</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={handleDownload}
-            disabled={isExporting}
-            className="px-3 py-1 text-xs font-medium text-white dark:text-neutral-900 bg-neutral-900 dark:bg-white hover:bg-neutral-800 dark:hover:bg-neutral-100 disabled:opacity-50 rounded-md flex items-center gap-1.5 transition-colors shadow-xs"
-          >
-            <Download className="w-3.5 h-3.5" />
-            <span>{isExporting ? ui.generatingPdf : ui.btnDownloadPdf}</span>
-          </button>
         </div>
       </div>
 
       {/* Preview Viewport Canvas */}
       <div
         ref={containerRef}
-        className="flex-1 overflow-x-auto overflow-y-auto p-2 sm:p-6 flex items-start justify-center min-h-[440px] max-w-full"
+        className="flex-1 overflow-x-auto overflow-y-auto p-2 sm:p-6 flex items-start justify-center min-h-[440px] max-w-full relative group"
       >
-        {/* Exact-dimension box to contain the scaled A4 document and prevent mobile layout overflow */}
+        {/* Desktop Hover Zoom Indicator */}
+        <div className="hidden lg:flex items-center gap-1.5 absolute top-4 right-4 z-20 px-2.5 py-1 rounded-full bg-neutral-900/80 dark:bg-white/90 text-white dark:text-neutral-900 text-[11px] font-mono font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none shadow-md backdrop-blur-xs">
+          <ZoomIn className="w-3 h-3" />
+          <span>{zoomLevel >= 1 ? 'Click to Fit' : 'Click for 100%'}</span>
+        </div>
+
+        {/* Scaled A4 Document Container */}
         <div
+          onClick={handleDesktopClickZoom}
           style={{
             width: `${effectiveWidth}px`,
             height: `${effectiveHeight}px`,
             position: 'relative'
           }}
-          className="shadow-xl rounded-sm print-sheet shrink-0 transition-all duration-150"
+          className="shadow-xl rounded-sm print-sheet shrink-0 transition-all duration-150 cursor-default lg:cursor-zoom-in group-hover:ring-2 lg:group-hover:ring-neutral-400/40 dark:lg:group-hover:ring-neutral-600/40"
         >
           <div
             id="quotation-print-target"

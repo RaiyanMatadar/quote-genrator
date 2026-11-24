@@ -8,15 +8,9 @@ import {
   Download,
   Printer,
   FilePlus,
-  Copy,
   History,
   Palette,
-  Globe,
-  Coins,
-  Layout,
-  Check,
-  Sun,
-  Moon
+  Check
 } from 'lucide-react';
 import { downloadQuotePDF, printQuote } from '../../utils/pdfExporter';
 import {
@@ -24,16 +18,16 @@ import {
   getHistoryList,
   loadQuoteFromHistory
 } from '../../utils/storage';
+import { ModernModal } from '../ui/ModernModal';
 
 interface ToolbarProps {
   quote: QuoteData;
   ui: SiteUiDictionary;
   siteLanguage: string;
   onSiteLanguageChange: (lang: string) => void;
-  isDark: boolean;
-  onThemeToggle: () => void;
   onChange: (updated: QuoteData) => void;
   onReset: () => void;
+  onNotify?: (text: string, type: 'success' | 'error' | 'info') => void;
 }
 
 export const Toolbar: React.FC<ToolbarProps> = ({
@@ -41,13 +35,13 @@ export const Toolbar: React.FC<ToolbarProps> = ({
   ui,
   siteLanguage,
   onSiteLanguageChange,
-  isDark,
-  onThemeToggle,
   onChange,
-  onReset
+  onReset,
+  onNotify
 }) => {
   const [isExporting, setIsExporting] = useState(false);
   const [showHistoryModal, setShowHistoryModal] = useState(false);
+  const [showNewQuoteModal, setShowNewQuoteModal] = useState(false);
   const [savedDrafts, setSavedDrafts] = useState(getHistoryList());
 
   const handleDownload = async () => {
@@ -55,25 +49,19 @@ export const Toolbar: React.FC<ToolbarProps> = ({
     try {
       saveToHistory(quote);
       await downloadQuotePDF('quotation-print-target', quote.meta.quoteNumber);
+      if (onNotify) {
+        onNotify('PDF downloaded successfully!', 'success');
+      }
     } catch (err: any) {
       console.error(err);
-      alert(`Unable to download PDF: ${err.message || 'Error'}`);
+      if (onNotify) {
+        onNotify(`Download failed: ${err.message || 'Please use Print button'}`, 'error');
+      } else {
+        alert(`Unable to download PDF: ${err.message || 'Error'}`);
+      }
     } finally {
       setIsExporting(false);
     }
-  };
-
-  const handleDuplicate = () => {
-    const duplicated: QuoteData = {
-      ...quote,
-      id: 'quote-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6),
-      meta: {
-        ...quote.meta,
-        quoteNumber: `${quote.meta.quoteNumber}-COPY`
-      }
-    };
-    saveToHistory(quote);
-    onChange(duplicated);
   };
 
   const openHistory = () => {
@@ -86,6 +74,18 @@ export const Toolbar: React.FC<ToolbarProps> = ({
     if (loaded) {
       onChange(loaded);
       setShowHistoryModal(false);
+      if (onNotify) {
+        onNotify(`Restored draft ${loaded.meta.quoteNumber}`, 'info');
+      }
+    }
+  };
+
+  const confirmNewQuote = () => {
+    saveToHistory(quote);
+    onReset();
+    setShowNewQuoteModal(false);
+    if (onNotify) {
+      onNotify('Created new quotation draft', 'info');
     }
   };
 
@@ -95,26 +95,22 @@ export const Toolbar: React.FC<ToolbarProps> = ({
         {/* Left Section: Template, Colors, Currency, Website Language */}
         <div className="flex flex-wrap items-center gap-2">
           {/* Template Selector */}
-          <div className="relative flex items-center">
-            <Layout className="w-3.5 h-3.5 text-neutral-400 absolute left-2.5 pointer-events-none" />
-            <select
-              value={quote.branding.templateId}
-              onChange={(e) =>
-                onChange({
-                  ...quote,
-                  branding: { ...quote.branding, templateId: e.target.value as any }
-                })
-              }
-              title={ui.template}
-              className="text-xs font-medium pl-8 pr-7 py-1.5 bg-neutral-50 dark:bg-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-700 border border-neutral-200 dark:border-neutral-700 rounded-md cursor-pointer focus:outline-hidden focus:border-neutral-900 dark:focus:border-neutral-400 appearance-none text-neutral-800 dark:text-neutral-200"
-            >
-              {TEMPLATES.map((tmpl) => (
-                <option key={tmpl.id} value={tmpl.id}>
-                  {tmpl.name}
-                </option>
-              ))}
-            </select>
-          </div>
+          <select
+            value={quote.branding.templateId}
+            onChange={(e) =>
+              onChange({
+                ...quote,
+                branding: { ...quote.branding, templateId: e.target.value as any }
+              })
+            }
+            title={ui.template}
+          >
+            {TEMPLATES.map((tmpl) => (
+              <option key={tmpl.id} value={tmpl.id}>
+                {tmpl.name}
+              </option>
+            ))}
+          </select>
 
           {/* Accent Color Palette */}
           <div className="flex items-center gap-1 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-md p-1">
@@ -141,52 +137,35 @@ export const Toolbar: React.FC<ToolbarProps> = ({
           </div>
 
           {/* Currency Selector */}
-          <div className="relative flex items-center">
-            <Coins className="w-3.5 h-3.5 text-neutral-400 absolute left-2.5 pointer-events-none" />
-            <select
-              value={quote.currency}
-              onChange={(e) => onChange({ ...quote, currency: e.target.value })}
-              title={ui.currency}
-              className="text-xs font-mono font-medium pl-8 pr-7 py-1.5 bg-neutral-50 dark:bg-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-700 border border-neutral-200 dark:border-neutral-700 rounded-md cursor-pointer focus:outline-hidden focus:border-neutral-900 dark:focus:border-neutral-400 appearance-none text-neutral-800 dark:text-neutral-200"
-            >
-              {ALL_CURRENCIES.map((c) => (
-                <option key={c.code} value={c.code}>
-                  {c.code} ({c.symbol})
-                </option>
-              ))}
-            </select>
-          </div>
+          <select
+            value={quote.currency}
+            onChange={(e) => onChange({ ...quote, currency: e.target.value })}
+            title={ui.currency}
+            className="font-mono font-medium"
+          >
+            {ALL_CURRENCIES.map((c) => (
+              <option key={c.code} value={c.code}>
+                {c.code} ({c.symbol})
+              </option>
+            ))}
+          </select>
 
           {/* Website Interface Language Selector */}
-          <div className="relative flex items-center">
-            <Globe className="w-3.5 h-3.5 text-neutral-400 absolute left-2.5 pointer-events-none" />
-            <select
-              value={siteLanguage}
-              onChange={(e) => onSiteLanguageChange(e.target.value)}
-              title={ui.websiteLanguage}
-              className="text-xs font-medium pl-8 pr-7 py-1.5 bg-neutral-50 dark:bg-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-700 border border-neutral-200 dark:border-neutral-700 rounded-md cursor-pointer focus:outline-hidden focus:border-neutral-900 dark:focus:border-neutral-400 appearance-none text-neutral-800 dark:text-neutral-200"
-            >
-              {SUPPORTED_LANGUAGES.map((lang) => (
-                <option key={lang.code} value={lang.code}>
-                  {lang.nativeName}
-                </option>
-              ))}
-            </select>
-          </div>
+          <select
+            value={siteLanguage}
+            onChange={(e) => onSiteLanguageChange(e.target.value)}
+            title={ui.websiteLanguage}
+          >
+            {SUPPORTED_LANGUAGES.map((lang) => (
+              <option key={lang.code} value={lang.code}>
+                {lang.nativeName}
+              </option>
+            ))}
+          </select>
         </div>
 
-        {/* Right Section: Drafts, New, Duplicate, Print, Download & Dark Mode */}
+        {/* Right Section: Drafts, New, Print & Download */}
         <div className="flex flex-wrap items-center gap-2">
-          {/* Dark Mode Quick Toggle */}
-          <button
-            type="button"
-            onClick={onThemeToggle}
-            title={ui.themeToggle}
-            className="p-1.5 text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white rounded-md border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
-          >
-            {isDark ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
-          </button>
-
           {/* History */}
           <button
             type="button"
@@ -198,31 +177,15 @@ export const Toolbar: React.FC<ToolbarProps> = ({
             <span className="hidden sm:inline">{ui.btnHistory}</span>
           </button>
 
-          {/* New Quote */}
+          {/* New Quote (Replaced plain window.confirm with ModernModal) */}
           <button
             type="button"
-            onClick={() => {
-              if (confirm('Create a new quote? Current draft is saved in History.')) {
-                saveToHistory(quote);
-                onReset();
-              }
-            }}
+            onClick={() => setShowNewQuoteModal(true)}
             title="Start New Quote"
             className="px-2.5 py-1.5 text-xs text-neutral-600 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-md border border-neutral-200 dark:border-neutral-700 flex items-center gap-1 transition-colors"
           >
             <FilePlus className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">{ui.btnNew}</span>
-          </button>
-
-          {/* Duplicate */}
-          <button
-            type="button"
-            onClick={handleDuplicate}
-            title="Duplicate Current Quote"
-            className="px-2.5 py-1.5 text-xs text-neutral-600 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-md border border-neutral-200 dark:border-neutral-700 flex items-center gap-1 transition-colors"
-          >
-            <Copy className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">{ui.btnDuplicate}</span>
           </button>
 
           {/* Print */}
@@ -248,7 +211,18 @@ export const Toolbar: React.FC<ToolbarProps> = ({
         </div>
       </div>
 
-      {/* History Modal */}
+      {/* Modern Confirmation Modal for New Quote (Replacing window.confirm) */}
+      <ModernModal
+        isOpen={showNewQuoteModal}
+        title="Start a new quotation?"
+        description="Your current quotation has been saved to History. Starting a new quote will reset the form fields."
+        confirmLabel="Create New Quote"
+        cancelLabel="Keep Editing"
+        onConfirm={confirmNewQuote}
+        onCancel={() => setShowNewQuoteModal(false)}
+      />
+
+      {/* Modern History Modal */}
       {showHistoryModal && (
         <div className="fixed inset-0 z-50 bg-neutral-950/50 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 p-5 max-w-md w-full shadow-2xl space-y-4">
@@ -259,7 +233,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
               <button
                 type="button"
                 onClick={() => setShowHistoryModal(false)}
-                className="text-neutral-400 hover:text-neutral-900 dark:hover:text-white text-sm"
+                className="text-neutral-400 hover:text-neutral-900 dark:hover:text-white text-sm p-1 rounded"
               >
                 ✕
               </button>
@@ -296,7 +270,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
               <button
                 type="button"
                 onClick={() => setShowHistoryModal(false)}
-                className="px-3 py-1.5 text-xs text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white border border-neutral-200 dark:border-neutral-700 rounded-md"
+                className="px-3.5 py-1.5 text-xs font-medium text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white border border-neutral-200 dark:border-neutral-700 rounded-md transition-colors"
               >
                 {ui.close}
               </button>

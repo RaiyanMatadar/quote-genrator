@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import type { QuoteData } from '../../types/quote';
 import { Toolbar } from './Toolbar';
 import { QuoteEditor } from './QuoteEditor';
@@ -9,6 +9,7 @@ import {
   createDefaultQuote
 } from '../../utils/storage';
 import { getSiteUiTranslation } from '../../data/uiTranslations';
+import { ToastNotification, type ToastMessage } from '../ui/ToastNotification';
 import { Edit3, Eye, CheckCircle2 } from 'lucide-react';
 
 export const QuoteApp: React.FC = () => {
@@ -18,11 +19,23 @@ export const QuoteApp: React.FC = () => {
   const [saveStatus, setSaveStatus] = useState<string>('Ready');
   const [isClient, setIsClient] = useState<boolean>(false);
 
+  // Modern Toast notification state
+  const [toasts, setToasts] = useState<ToastMessage[]>([]);
+
   // Website UI Language state
   const [siteLanguage, setSiteLanguage] = useState<string>('en');
 
-  // Dark Theme state
-  const [isDark, setIsDark] = useState<boolean>(false);
+  const addToast = useCallback((text: string, type: 'success' | 'error' | 'info' = 'info') => {
+    const id = 'toast-' + Date.now() + '-' + Math.random().toString(36).substring(2, 5);
+    setToasts((prev) => [...prev, { id, type, text }]);
+    setTimeout(() => {
+      setToasts((prev) => prev.filter((t) => t.id !== id));
+    }, 3500);
+  }, []);
+
+  const removeToast = useCallback((id: string) => {
+    setToasts((prev) => prev.filter((t) => t.id !== id));
+  }, []);
 
   // Hydrate client-side state on mount
   useEffect(() => {
@@ -40,25 +53,6 @@ export const QuoteApp: React.FC = () => {
     if (storedLang) {
       setSiteLanguage(storedLang);
     }
-
-    // 3. Theme detection
-    const checkDark = () => {
-      const darkActive = document.documentElement.classList.contains('dark');
-      setIsDark(darkActive);
-    };
-    checkDark();
-
-    // Listen for theme change events from header or toolbar
-    const handleThemeEvent = (e: any) => {
-      if (e.detail && typeof e.detail.isDark === 'boolean') {
-        setIsDark(e.detail.isDark);
-      } else {
-        checkDark();
-      }
-    };
-    window.addEventListener('theme-changed', handleThemeEvent);
-
-    return () => window.removeEventListener('theme-changed', handleThemeEvent);
   }, []);
 
   // Debounced auto-save to localStorage on quote updates
@@ -74,32 +68,18 @@ export const QuoteApp: React.FC = () => {
     return () => clearTimeout(timer);
   }, [quote, isClient]);
 
-  // Handle manual theme toggle
-  const handleThemeToggle = () => {
-    const nextDark = !isDark;
-    setIsDark(nextDark);
-    if (nextDark) {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
-    }
-    window.dispatchEvent(new CustomEvent('theme-changed', { detail: { isDark: nextDark } }));
-  };
-
   // Handle website UI language switch
   const handleSiteLanguageChange = (newLang: string) => {
     setSiteLanguage(newLang);
     try {
       localStorage.setItem('site_language', newLang);
+      addToast('Website language updated', 'info');
     } catch {}
   };
 
   const handleReset = () => {
     const fresh = createDefaultQuote();
     fresh.id = 'quote-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6);
-    // Generate new quote number
     const randomNum = Math.floor(100 + Math.random() * 900);
     fresh.meta.quoteNumber = `Q-2026-${randomNum}`;
     setQuote(fresh);
@@ -117,10 +97,9 @@ export const QuoteApp: React.FC = () => {
         ui={ui}
         siteLanguage={siteLanguage}
         onSiteLanguageChange={handleSiteLanguageChange}
-        isDark={isDark}
-        onThemeToggle={handleThemeToggle}
         onChange={setQuote}
         onReset={handleReset}
+        onNotify={addToast}
       />
 
       {/* Mobile Tab Switcher (<lg) */}
@@ -149,8 +128,8 @@ export const QuoteApp: React.FC = () => {
         </button>
       </div>
 
-      {/* Main Split-Pane Workspace */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+      {/* Main Split-Pane Workspace (Sticky preview enabled) */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start relative">
         {/* Editor Column (7 cols on desktop) */}
         <div
           className={`lg:col-span-7 space-y-6 editor-pane ${
@@ -174,15 +153,18 @@ export const QuoteApp: React.FC = () => {
           <QuoteEditor quote={quote} ui={ui} onChange={setQuote} />
         </div>
 
-        {/* Live Preview Column (5 cols on desktop, sticky) */}
+        {/* Live Preview Column (5 cols on desktop, sticky following user scroll) */}
         <div
-          className={`lg:col-span-5 lg:sticky lg:top-20 ${
+          className={`lg:col-span-5 lg:sticky lg:top-20 z-10 self-start ${
             activeTab === 'preview' ? 'block' : 'hidden lg:block'
           }`}
         >
           <QuotePreview quote={quote} ui={ui} />
         </div>
       </div>
+
+      {/* Modern Toast Notifications (Replacing plain alert()) */}
+      <ToastNotification toasts={toasts} onDismiss={removeToast} />
     </div>
   );
 };

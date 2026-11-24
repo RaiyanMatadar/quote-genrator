@@ -1,4 +1,4 @@
-// Client-side PDF exporter with robust module resolution and clean snapshotting
+// Client-side PDF exporter with html2canvas-pro (native oklch support) and resilient color sanitization
 export async function downloadQuotePDF(elementId: string, quoteNumber: string = 'QUOTE'): Promise<void> {
   if (typeof window === 'undefined') return;
 
@@ -7,26 +7,24 @@ export async function downloadQuotePDF(elementId: string, quoteNumber: string = 
     throw new Error(`Quotation element with id "${elementId}" not found.`);
   }
 
-  // 1. Dynamically import jsPDF, html2canvas, and canvas-confetti with resilient fallback
+  // 1. Dynamically import jsPDF, html2canvas-pro (with html2canvas fallback), and canvas-confetti
   const [jspdfModule, html2canvasModule, confettiModule] = await Promise.all([
     import('jspdf'),
-    import('html2canvas'),
+    import('html2canvas-pro').catch(() => import('html2canvas')),
     import('canvas-confetti')
   ]);
 
-  // Resilient constructor extraction for both ESM and CJS bundles
+  // Resilient constructor extraction
   const jsPDF = (jspdfModule as any).jsPDF || (jspdfModule as any).default || jspdfModule;
-  const html2canvas = (html2canvasModule as any).default || html2canvasModule;
+  const html2canvas = (html2canvasModule as any).default || (html2canvasModule as any).html2canvas || html2canvasModule;
   const confetti = (confettiModule as any).default || confettiModule;
 
   if (typeof jsPDF !== 'function') {
     throw new Error('jsPDF library failed to initialize as a constructor.');
   }
 
-  // 2. Create an isolated offscreen clone container at exact A4 width (794px)
-  // This completely eliminates issues where parent CSS transforms (scale) or mobile viewport
-  // widths cause html2canvas to produce distorted, clipped, or blank PDFs!
-  const a4WidthPx = 794; // 210mm at 96 DPI
+  // 2. Create an isolated offscreen clone container at exact A4 width (794px = 210mm at 96 DPI)
+  const a4WidthPx = 794;
   const cloneWrapper = document.createElement('div');
   cloneWrapper.style.position = 'fixed';
   cloneWrapper.style.left = '-99999px';
@@ -45,11 +43,52 @@ export async function downloadQuotePDF(elementId: string, quoteNumber: string = 
   clonedTarget.style.boxSizing = 'border-box';
   clonedTarget.style.backgroundColor = '#ffffff';
 
+  // 3. Resilient color normalization for any legacy canvas engines
+  // Converts any computed 'oklch' values to standard hex/rgba via a temporary 2D canvas context
+  try {
+    const helperCanvas = document.createElement('canvas');
+    const helperCtx = helperCanvas.getContext('2d');
+    if (helperCtx) {
+      const colorProps = [
+        'color',
+        'backgroundColor',
+        'borderColor',
+        'borderTopColor',
+        'borderBottomColor',
+        'borderLeftColor',
+        'borderRightColor',
+        'outlineColor',
+        'fill',
+        'stroke'
+      ];
+
+      const elements = [clonedTarget, ...Array.from(clonedTarget.querySelectorAll('*'))] as HTMLElement[];
+      for (const el of elements) {
+        const computed = window.getComputedStyle(el);
+        for (const prop of colorProps) {
+          const val = (computed as any)[prop];
+          if (typeof val === 'string' && val.includes('oklch')) {
+            try {
+              helperCtx.fillStyle = '#000000';
+              helperCtx.fillStyle = val;
+              (el.style as any)[prop] = helperCtx.fillStyle;
+            } catch {}
+          }
+        }
+        if (computed.boxShadow && computed.boxShadow.includes('oklch')) {
+          el.style.boxShadow = 'none';
+        }
+      }
+    }
+  } catch (err) {
+    console.warn('Color normalization warning:', err);
+  }
+
   cloneWrapper.appendChild(clonedTarget);
   document.body.appendChild(cloneWrapper);
 
   try {
-    // Wait for any images inside the clone to be ready
+    // Wait for all images in the clone to complete loading
     const images = Array.from(clonedTarget.querySelectorAll('img'));
     await Promise.all(
       images.map(
@@ -64,7 +103,7 @@ export async function downloadQuotePDF(elementId: string, quoteNumber: string = 
       )
     );
 
-    // 3. Render high-resolution canvas at 2x scale for crisp print quality
+    // 4. Render high-resolution canvas with html2canvas-pro
     const canvas = await html2canvas(clonedTarget, {
       scale: 2,
       useCORS: true,
@@ -77,7 +116,7 @@ export async function downloadQuotePDF(elementId: string, quoteNumber: string = 
 
     const imgData = canvas.toDataURL('image/jpeg', 0.96);
 
-    // 4. Create standard A4 PDF (210mm x 297mm)
+    // 5. Create A4 PDF (210mm x 297mm)
     const pdf = new jsPDF({
       orientation: 'portrait',
       unit: 'mm',
@@ -97,7 +136,7 @@ export async function downloadQuotePDF(elementId: string, quoteNumber: string = 
     pdf.addImage(imgData, 'JPEG', 0, positionMm, imgWidthMm, imgHeightMm, undefined, 'FAST');
     heightLeftMm -= pageHeightMm;
 
-    // Multi-page handling if document exceeds one page (5mm buffer)
+    // Multi-page handling (5mm buffer threshold)
     while (heightLeftMm > 5) {
       positionMm -= pageHeightMm;
       pdf.addPage();
@@ -108,7 +147,7 @@ export async function downloadQuotePDF(elementId: string, quoteNumber: string = 
     const cleanNumber = (quoteNumber || 'Quote').trim().replace(/[^a-zA-Z0-9_\-\.]/g, '_');
     pdf.save(`${cleanNumber}.pdf`);
 
-    // Festive confetti feedback
+    // Celebration confetti
     try {
       confetti({
         particleCount: 50,
@@ -117,10 +156,9 @@ export async function downloadQuotePDF(elementId: string, quoteNumber: string = 
         colors: ['#0070f3', '#171717', '#50e3c2', '#7928ca']
       });
     } catch {
-      // Confetti is decorative
+      // Decorative
     }
   } finally {
-    // Clean up offscreen clone
     if (cloneWrapper.parentNode) {
       cloneWrapper.parentNode.removeChild(cloneWrapper);
     }
