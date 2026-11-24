@@ -1,0 +1,224 @@
+---
+// src/pages/about.astro
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/landing/Header.astro';
+import Footer from '../components/landing/Footer.astro';
+---
+
+<Layout
+  title="About Us – Quote Generator Free | The Free & Private Quotation Builder"
+  description="Discover the mission, philosophy, and principles behind Quote Generator Free. The in-browser, 100% client-side quotation generator software for freelancers, contractors, and businesses."
+  canonicalPath="/about"
+  breadcrumbTitle="About Us"
+>
+  <Header />
+
+  <main class="flex-1 w-full bg-[#fafafa] dark:bg-[#09090b] text-[#171717] dark:text-[#ededed]">
+    
+    <!-- Hero Section with subtle mesh gradient -->
+    <section class="relative py-16 sm:py-24 border-b border-neutral-200 dark:border-neutral-800 hero-mesh-gradient overflow-hidden">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+        
+        <!-- Breadcrumb -->
+        <nav class="flex justify-center items-center gap-2 text-xs text-neutral-500 dark:text-neutral-400 mb-6 font-mono">
+          <a href="/" class="hover:text-neutral-900 dark:hover:text-white transition-colors">Home</a>
+          <span class="text-neutral-300 dark:text-neutral-700">/</span>
+          <span class="text-neutral-900 dark:text-neutral-100 font-semibold">About Us</span>
+        </nav>
+
+        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 mb-6 shadow-xs">
+          <span>Our Story & Philosophy</span>
+        </div>
+
+        <h1 class="text-3xl sm:text-5xl font-black tracking-tight text-neutral-950 dark:text-white leading-[1.2] max-w-3xl mx-auto">
+          A Better Way to Create Quotes.<br />
+          <span class="text-neutral-500 dark:text-neutral-400 font-normal">Fast, Private, & 100% Free.</span>
+        </h1>
+
+        <p class="mt-6 text-base sm:text-lg text-neutral-600 dark:text-neutral-300 max-w-2xl mx-auto leading-relaxed">
+          We built Quote Generator Free because creating a professional sales estimate or business proposal shouldn't require monthly subscriptions, forced accounts, watermarks, or handing over your client data.
+        </p>
+
+        <div class="mt-8 flex flex-wrap justify-center items-center gap-4">
+          <a
+            href="/#editor"
+            class="px-6 py-2.5 rounded-full text-xs sm:text-sm font-semibold bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 hover:bg-neutral-800 dark:hover:bg-neutral-100 transition-colors shadow-sm"
+          >
+            Launch Quote Generator
+          </a>
+          <a
+            href="/contact"
+            class="px-6 py-2.5 rounded-full text-xs sm:text-sm font-semibold border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors"
+          >
+            Get in Touch
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Content Container -->
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-20 space-y-16 sm:space-y-20">
+
+      <!-- Section 1: Our Story & Mission -->
+      <section id="mission" class="space-y-6">
+        <div class="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-neutral-500 dark:text-neutral-400 font-semibold">
+          <span>01 / Our Story</span>
+        </div>
+        
+        <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-neutral-950 dark:text-white">
+          Why Quote Generator Free Exists
+        </h2>
+
+        <div class="space-y-4 text-sm sm:text-base leading-relaxed text-neutral-600 dark:text-neutral-300">
+          <p>
+            Every day, millions of freelancers, electrical contractors, independent consultants, digital designers, and small business owners need to send client quotes. But when searching online, they are greeted by the same frustrating barriers:
+          </p>
+
+          <ul class="space-y-3 pl-6 list-disc text-neutral-700 dark:text-neutral-300 my-4">
+            <li>
+              <strong class="text-neutral-900 dark:text-white">The Freemium Trap:</strong> Tools that let you type a whole estimate, only to demand your credit card and a costly monthly subscription right when you click "Download PDF".
+            </li>
+            <li>
+              <strong class="text-neutral-900 dark:text-white">Intrusive Watermarks:</strong> Sites that stamp giant corporate branding over your estimates unless you pay for a premium tier.
+            </li>
+            <li>
+              <strong class="text-neutral-900 dark:text-white">Forced Signups & Data Harvesting:</strong> Platforms that force you to create accounts, verify emails, and store your confidential customer lists, hourly rates, and banking numbers on their centralized cloud servers.
+            </li>
+            <li>
+              <strong class="text-neutral-900 dark:text-white">Bloated Software Suites:</strong> Clunky software with dozens of unnecessary menu screens where all you wanted was a clean, crisp one-page quotation.
+            </li>
+          </ul>
+
+          <p>
+            We believed there had to be a modern alternative. Software should respect your time, protect your confidentiality, and provide high craftsmanship without strings attached. That is why Quote Generator Free was created.
+          </p>
+        </div>
+      </section>
+
+      <!-- Section 2: Our Core Principles -->
+      <section id="principles" class="space-y-8">
+        <div class="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-neutral-500 dark:text-neutral-400 font-semibold">
+          <span>02 / Guiding Values</span>
+        </div>
+
+        <div>
+          <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-neutral-950 dark:text-white">
+            Our Four Core Principles
+          </h2>
+          <p class="mt-2 text-sm text-neutral-500 dark:text-neutral-400">
+            The core commitments that define how we build and maintain this tool.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+          
+          <!-- Pillar 1 -->
+          <div class="p-6 sm:p-7 rounded-2xl bg-white dark:bg-[#121215] border border-neutral-200 dark:border-neutral-800 space-y-3.5 shadow-2xs">
+            <div class="w-10 h-10 rounded-xl bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-900 dark:text-white">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+            </div>
+            <h3 class="text-base font-bold text-neutral-950 dark:text-white">1. Total Client-Side Privacy</h3>
+            <p class="text-xs sm:text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
+              Your quotes, hourly pricing, client names, and banking details are processed 100% inside your local browser memory. No servers intercept your numbers, and no remote database records your clients.
+            </p>
+          </div>
+
+          <!-- Pillar 2 -->
+          <div class="p-6 sm:p-7 rounded-2xl bg-white dark:bg-[#121215] border border-neutral-200 dark:border-neutral-800 space-y-3.5 shadow-2xs">
+            <div class="w-10 h-10 rounded-xl bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-900 dark:text-white">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h3 class="text-base font-bold text-neutral-950 dark:text-white">2. Free Forever & Watermark-Free</h3>
+            <p class="text-xs sm:text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
+              No hidden paywalls, no "upgrade to unlock" tricks, and zero watermarks. Whether you create one quote a month or fifty quotes a day, Quote Generator Free is completely unrestricted.
+            </p>
+          </div>
+
+          <!-- Pillar 3 -->
+          <div class="p-6 sm:p-7 rounded-2xl bg-white dark:bg-[#121215] border border-neutral-200 dark:border-neutral-800 space-y-3.5 shadow-2xs">
+            <div class="w-10 h-10 rounded-xl bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-900 dark:text-white">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            </div>
+            <h3 class="text-base font-bold text-neutral-950 dark:text-white">3. Speed & Design Craftsmanship</h3>
+            <p class="text-xs sm:text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
+              We care deeply about typography, proportions, and UI elegance. Our live A4 preview updates instantaneously as you type, and our designer templates render print-ready vector PDFs in seconds.
+            </p>
+          </div>
+
+          <!-- Pillar 4 -->
+          <div class="p-6 sm:p-7 rounded-2xl bg-white dark:bg-[#121215] border border-neutral-200 dark:border-neutral-800 space-y-3.5 shadow-2xs">
+            <div class="w-10 h-10 rounded-xl bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-900 dark:text-white">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h3 class="text-base font-bold text-neutral-950 dark:text-white">4. Universal Accessibility</h3>
+            <p class="text-xs sm:text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
+              Business is global. We support 150+ international currencies, 12 website and quotation languages (including RTL Arabic), flexible multi-tax engines (VAT, GST, HST), and responsive mobile support.
+            </p>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Section 3: Who Uses Quote Generator Free -->
+      <section id="audience" class="space-y-6">
+        <div class="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-neutral-500 dark:text-neutral-400 font-semibold">
+          <span>03 / Community</span>
+        </div>
+
+        <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-neutral-950 dark:text-white">
+          Who Is Quote Generator Free For?
+        </h2>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-2">
+          <div class="p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50/70 dark:bg-neutral-900/40 space-y-2.5">
+            <h4 class="font-bold text-sm sm:text-base text-neutral-950 dark:text-white">Freelancers & Creators</h4>
+            <p class="text-xs sm:text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
+              Designers, developers, copywriters, and video editors who need to send sleek, polished proposals without expensive invoicing subscriptions.
+            </p>
+          </div>
+          <div class="p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50/70 dark:bg-neutral-900/40 space-y-2.5">
+            <h4 class="font-bold text-sm sm:text-base text-neutral-950 dark:text-white">Contractors & Trades</h4>
+            <p class="text-xs sm:text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
+              Electricians, plumbers, builders, HVAC specialists, and painters who need quick estimates with line-item materials, labor rates, and digital sign-offs.
+            </p>
+          </div>
+          <div class="p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50/70 dark:bg-neutral-900/40 space-y-2.5">
+            <h4 class="font-bold text-sm sm:text-base text-neutral-950 dark:text-white">Agencies & SMBs</h4>
+            <p class="text-xs sm:text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
+              Growing companies and boutique consulting firms seeking custom-branded quotes with multi-tier taxes, payment terms, and direct bank routing info.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- CTA Box -->
+      <section class="p-8 sm:p-12 rounded-3xl bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 text-center space-y-5 shadow-lg">
+        <h3 class="text-2xl sm:text-3xl font-black tracking-tight">
+          Ready to build your next quotation?
+        </h3>
+        <p class="text-xs sm:text-sm text-neutral-300 dark:text-neutral-600 max-w-md mx-auto leading-relaxed">
+          No signup required. Open the editor, enter your details, customize your template, and download your free PDF instantly.
+        </p>
+        <div class="pt-2">
+          <a
+            href="/#editor"
+            class="inline-flex items-center justify-center px-7 py-3 rounded-full text-xs sm:text-sm font-bold bg-white text-neutral-950 dark:bg-neutral-950 dark:text-white hover:opacity-90 transition-opacity shadow-md"
+          >
+            Create a Free Quote Now →
+          </a>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <Footer />
+</Layout>

@@ -1,0 +1,254 @@
+---
+// src/pages/privacy-policy.astro
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/landing/Header.astro';
+import Footer from '../components/landing/Footer.astro';
+
+const lastUpdated = "November 24, 2026";
+---
+
+<Layout
+  title="Privacy Policy – Quote Generator Free"
+  description="Learn about our privacy commitment. Quote Generator Free processes 100% of your data client-side in your browser. No server storage, no cookies, and zero tracking."
+  canonicalPath="/privacy-policy"
+  breadcrumbTitle="Privacy Policy"
+>
+  <Header />
+
+  <main class="flex-1 w-full bg-[#fafafa] dark:bg-[#09090b] text-[#171717] dark:text-[#ededed] py-12 sm:py-16">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Breadcrumb -->
+      <nav class="flex items-center gap-2 text-xs text-neutral-500 dark:text-neutral-400 mb-8 font-mono">
+        <a href="/" class="hover:text-neutral-900 dark:hover:text-white transition-colors">Home</a>
+        <span class="text-neutral-300 dark:text-neutral-700">/</span>
+        <span class="text-neutral-900 dark:text-neutral-100 font-semibold">Privacy Policy</span>
+      </nav>
+
+      <!-- Page Header -->
+      <div class="border-b border-neutral-200 dark:border-neutral-800 pb-8 mb-10">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/60 mb-4">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+          100% In-Browser & Client-Side Private
+        </div>
+        <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-neutral-950 dark:text-white">
+          Privacy Policy
+        </h1>
+        <p class="mt-3 text-sm sm:text-base text-neutral-600 dark:text-neutral-400">
+          Last revised: <time datetime="2026-11-24" class="font-mono text-neutral-900 dark:text-neutral-200">{lastUpdated}</time>
+        </p>
+      </div>
+
+      <!-- Quick Summary Card -->
+      <div class="p-6 sm:p-7 rounded-2xl bg-neutral-100/70 dark:bg-neutral-900/70 border border-neutral-200 dark:border-neutral-800 mb-12 space-y-4">
+        <h2 class="text-xs font-semibold tracking-wider uppercase text-neutral-900 dark:text-neutral-100 font-mono">
+          Privacy Highlights at a Glance
+        </h2>
+        <ul class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs sm:text-sm text-neutral-600 dark:text-neutral-300">
+          <li class="flex items-start gap-2.5">
+            <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+            <span><strong class="text-neutral-900 dark:text-white">Zero Server Storage:</strong> Your quotes, financial sums, line items, and client data never leave your browser.</span>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+            <span><strong class="text-neutral-900 dark:text-white">No User Tracking:</strong> We do not track your personal identity, browsing habits, or commercial activities.</span>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+            <span><strong class="text-neutral-900 dark:text-white">No Tracking Cookies:</strong> We do not place advertising or persistent profiling cookies on your computer.</span>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+            <span><strong class="text-neutral-900 dark:text-white">Local Device Control:</strong> Drafts are stored purely on your local machine and can be cleared anytime.</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Legal Content Body -->
+      <div class="space-y-12 text-sm sm:text-base leading-relaxed text-neutral-700 dark:text-neutral-300">
+        
+        <!-- Section 1 -->
+        <section id="introduction" class="space-y-4">
+          <h2 class="text-xl sm:text-2xl font-bold tracking-tight text-neutral-950 dark:text-white">
+            1. Introduction
+          </h2>
+          <p>
+            At <strong>Quote Generator Free</strong> ("we," "us," or "our"), accessible at 
+            <a href="https://quotegeneratorfree.com" class="text-neutral-950 dark:text-white underline underline-offset-4 font-medium hover:text-neutral-700 dark:hover:text-neutral-200 transition-colors">https://quotegeneratorfree.com</a>, 
+            the privacy of our visitors and users is our top priority. This Privacy Policy explains the nature of our client-side software and demonstrates how our technical design protects your personal and commercial information.
+          </p>
+          <p>
+            Unlike traditional cloud quotation, invoicing, and CRM platforms that transmit customer contact lists, line items, hourly rates, and banking details to centralized remote servers, <strong>Quote Generator Free operates 100% inside your web browser</strong>.
+          </p>
+        </section>
+
+        <!-- Section 2 -->
+        <section id="data-handling" class="space-y-4">
+          <h2 class="text-xl sm:text-2xl font-bold tracking-tight text-neutral-950 dark:text-white">
+            2. Information Handling
+          </h2>
+          
+          <h3 class="text-base sm:text-lg font-bold text-neutral-900 dark:text-neutral-100 pt-2">
+            A. Quotation & Business Details (Processed Exclusively in Browser)
+          </h3>
+          <p>
+            When preparing an estimate, quotation, or proposal, you may input business details including:
+          </p>
+          <ul class="space-y-2 pl-6 list-disc text-neutral-700 dark:text-neutral-300 my-3">
+            <li>Business names, addresses, emails, phone numbers, and regional tax registration numbers (VAT, GST, EIN).</li>
+            <li>Client contact details, project notes, and delivery requirements.</li>
+            <li>Itemized goods and services, quantities, hourly or unit rates, discounts, and regional taxes.</li>
+            <li>Payment instructions, bank account details, and IBAN/SWIFT routing identifiers.</li>
+            <li>Uploaded company logo graphics and drawn or typed digital signatures.</li>
+          </ul>
+          
+          <div class="p-5 rounded-2xl bg-blue-50/70 dark:bg-blue-950/30 border border-blue-200/80 dark:border-blue-900/60 text-xs sm:text-sm text-blue-950 dark:text-blue-200 my-4 leading-relaxed">
+            <strong class="font-semibold text-blue-900 dark:text-blue-100">Privacy Guarantee:</strong> None of this information is ever uploaded, transmitted, or logged to external servers or databases. All mathematical calculations, document formatting, and PDF rendering take place directly on your computer's local processor.
+          </div>
+
+          <h3 class="text-base sm:text-lg font-bold text-neutral-900 dark:text-neutral-100 pt-4">
+            B. Local Browser Storage
+          </h3>
+          <p>
+            To protect your work against accidental tab closures or computer restarts, Quote Generator Free utilizes browser-native local storage (<code class="px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-neutral-800 font-mono text-xs text-neutral-800 dark:text-neutral-200">localStorage</code>). This mechanism saves:
+          </p>
+          <ul class="space-y-2 pl-6 list-disc text-neutral-700 dark:text-neutral-300 my-3">
+            <li>Your active draft and recent draft history (accessible via the "History" panel).</li>
+            <li>Your visual theme preference (dark mode or light mode).</li>
+            <li>Your selected website language.</li>
+          </ul>
+          <p>
+            This data is stored solely on your local device. You retain complete control and can remove it at any time by selecting "Delete" within the History menu or by clearing your browser site data.
+          </p>
+        </section>
+
+        <!-- Section 3 -->
+        <section id="cookies" class="space-y-4">
+          <h2 class="text-xl sm:text-2xl font-bold tracking-tight text-neutral-950 dark:text-white">
+            3. Cookies & Tracking Technologies
+          </h2>
+          <p>
+            Quote Generator Free does <strong>not</strong> use advertising cookies, marketing pixels, cross-site beacons, or behavioral tracking scripts.
+          </p>
+          <p>
+            Session settings and user choices are kept locally in your browser so you can return to your drafts without an account or login.
+          </p>
+        </section>
+
+        <!-- Section 4 -->
+        <section id="infrastructure" class="space-y-4">
+          <h2 class="text-xl sm:text-2xl font-bold tracking-tight text-neutral-950 dark:text-white">
+            4. Web Delivery & Infrastructure
+          </h2>
+          <p>
+            Our web assets (HTML, CSS, JavaScript, and fonts) are statically hosted and distributed across global content delivery networks (CDNs) for high availability and low latency.
+          </p>
+          <ul class="space-y-2.5 pl-6 list-disc text-neutral-700 dark:text-neutral-300 my-3">
+            <li>
+              <strong class="text-neutral-900 dark:text-white">Standard Web Access:</strong> Like all web services, hosting providers may process standard HTTP server access logs (such as IP address, browser type, and requested resource) solely for traffic security, DDoS prevention, and network integrity. These access logs never contain your quotation contents.
+            </li>
+            <li>
+              <strong class="text-neutral-900 dark:text-white">Web Fonts:</strong> Standard Google Web Fonts are linked to render clean typography across devices.
+            </li>
+          </ul>
+        </section>
+
+        <!-- Section 5 -->
+        <section id="compliance" class="space-y-4">
+          <h2 class="text-xl sm:text-2xl font-bold tracking-tight text-neutral-950 dark:text-white">
+            5. Global Privacy Compliance (GDPR, CCPA & Beyond)
+          </h2>
+          <p>
+            Because Quote Generator Free does not collect, harvest, or store personally identifiable information (PII) on centralized servers:
+          </p>
+          <ul class="space-y-2.5 pl-6 list-disc text-neutral-700 dark:text-neutral-300 my-3">
+            <li>
+              <strong class="text-neutral-900 dark:text-white">Right to Access:</strong> All your quotation data resides exclusively within your local browser. You already have immediate, unrestricted access to everything you enter.
+            </li>
+            <li>
+              <strong class="text-neutral-900 dark:text-white">Right to Erasure:</strong> You can purge your drafts at any moment by deleting saved drafts in the toolbar or by clearing your browser cache.
+            </li>
+            <li>
+              <strong class="text-neutral-900 dark:text-white">No Data Selling:</strong> We do not sell, rent, monetize, or transfer your business or personal details to advertisers, data brokers, or marketing networks.
+            </li>
+          </ul>
+        </section>
+
+        <!-- Section 6 -->
+        <section id="security" class="space-y-4">
+          <h2 class="text-xl sm:text-2xl font-bold tracking-tight text-neutral-950 dark:text-white">
+            6. Security Safeguards
+          </h2>
+          <p>
+            All web traffic to Quote Generator Free is encrypted via Transport Layer Security (HTTPS/TLS). Because document compiling and PDF generation take place entirely on your device rather than over the network, your financial figures and proposals are safeguarded against network interception.
+          </p>
+        </section>
+
+        <!-- Section 7 -->
+        <section id="children" class="space-y-4">
+          <h2 class="text-xl sm:text-2xl font-bold tracking-tight text-neutral-950 dark:text-white">
+            7. Children's Privacy
+          </h2>
+          <p>
+            Quote Generator Free is intended for business professionals, contractors, freelancers, and commercial organizations. We do not knowingly collect personal information from individuals under the age of 13.
+          </p>
+        </section>
+
+        <!-- Section 8 -->
+        <section id="updates" class="space-y-4">
+          <h2 class="text-xl sm:text-2xl font-bold tracking-tight text-neutral-950 dark:text-white">
+            8. Policy Changes
+          </h2>
+          <p>
+            We may periodically update this Privacy Policy to reflect technical enhancements, architectural updates, or regulatory adjustments. Any changes will be published here with an updated revision date.
+          </p>
+        </section>
+
+        <!-- Section 9 -->
+        <section id="contact" class="space-y-4 border-t border-neutral-200 dark:border-neutral-800 pt-8">
+          <h2 class="text-xl sm:text-2xl font-bold tracking-tight text-neutral-950 dark:text-white">
+            9. Contact Us
+          </h2>
+          <p>
+            If you have questions, feedback, or privacy-related inquiries regarding our client-side architecture, please reach out through our 
+            <a href="/contact" class="text-neutral-950 dark:text-white underline underline-offset-4 font-semibold hover:text-neutral-700 dark:hover:text-neutral-200 transition-colors">Contact Page</a> 
+            or email us directly:
+          </p>
+          <div class="p-4 rounded-xl bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 w-fit font-mono text-xs sm:text-sm">
+            <span class="text-neutral-500 dark:text-neutral-400">Email: </span>
+            <a href="mailto:privacy@quotegeneratorfree.com" class="font-semibold text-neutral-900 dark:text-neutral-100 hover:underline">
+              privacy@quotegeneratorfree.com
+            </a>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- Bottom Navigation / Call to Action -->
+      <div class="mt-14 pt-8 border-t border-neutral-200 dark:border-neutral-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <a href="/" class="text-xs sm:text-sm font-semibold text-neutral-900 dark:text-neutral-100 hover:underline flex items-center gap-1.5">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Return to Quote Generator
+        </a>
+        <div class="flex items-center gap-4 text-xs text-neutral-500 dark:text-neutral-400">
+          <a href="/terms" class="hover:text-neutral-900 dark:hover:text-white transition-colors">Terms of Service</a>
+          <span>·</span>
+          <a href="/contact" class="hover:text-neutral-900 dark:hover:text-white transition-colors">Contact Support</a>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <Footer />
+</Layout>

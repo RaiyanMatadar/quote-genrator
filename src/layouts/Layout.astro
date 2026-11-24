@@ -5,17 +5,26 @@ import '../styles/global.css';
 interface Props {
   title?: string;
   description?: string;
+  canonicalPath?: string;
+  keywords?: string;
+  breadcrumbTitle?: string;
 }
 
 const {
   title = "Quote Generator – Free Quotation Generator Software & Estimate Builder",
-  description = "Free quote generator and quotation generator software. Create professional estimates, custom PDF quotes, and sales proposals with our automated quote builder. 100% free."
+  description = "Free quote generator and quotation generator software. Create professional estimates, custom PDF quotes, and sales proposals with our automated quote builder. 100% free.",
+  canonicalPath,
+  keywords,
+  breadcrumbTitle
 } = Astro.props;
 
-const canonicalUrl = "https://quotegeneratorfree.com";
-const ogImageUrl = "https://quotegeneratorfree.com/og-image.png";
+const siteRoot = "https://quotegeneratorfree.com";
+const canonicalUrl = canonicalPath
+  ? `${siteRoot}${canonicalPath.startsWith('/') ? canonicalPath : `/${canonicalPath}`}`
+  : `${siteRoot}${Astro.url.pathname === '/' ? '' : Astro.url.pathname}`;
+const ogImageUrl = `${siteRoot}/og-image.png`;
 
-const seoKeywords = [
+const defaultKeywords = [
   "quote generator",
   "quotation generator",
   "quotation generator software",
@@ -43,72 +52,96 @@ const seoKeywords = [
   "automated quote generator"
 ].join(", ");
 
+const seoKeywords = keywords || defaultKeywords;
+
+const graphItems: any[] = [
+  {
+    "@type": "WebApplication",
+    "@id": `${siteRoot}/#webapp`,
+    "name": "Quote Generator Free",
+    "alternateName": [
+      "Quote Generator",
+      "Quotation Generator",
+      "Quotation Generator Software",
+      "Free Estimate Generator",
+      "Digital Quote Builder",
+      "PDF Quote Generator"
+    ],
+    "url": siteRoot,
+    "description": description,
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "All",
+    "browserRequirements": "Requires JavaScript. Requires HTML5.",
+    "softwareVersion": "2.0.0",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.9",
+      "reviewCount": "1280",
+      "bestRating": "5",
+      "worstRating": "1"
+    },
+    "featureList": [
+      "Universal Logo Engine supporting PNG, JPG, SVG, WebP, and GIF",
+      "Instant Real-Time A4 PDF Preview & Printable Quote Generator",
+      "100% Client-Side Private Generation without Server Data Storage",
+      "150+ Currencies and Multi-Tax Dynamic Calculation Engine",
+      "5 Designer Quote Templates with Custom Color Themes",
+      "Built-in Digital Signature Pad for Client Quote Approval",
+      "Lightweight CPQ Software Line Items and Discount Automation",
+      "Seamless Quote to Invoice Software Transition Data"
+    ]
+  },
+  {
+    "@type": "Organization",
+    "@id": `${siteRoot}/#organization`,
+    "name": "Quote Generator Free",
+    "url": siteRoot,
+    "logo": {
+      "@type": "ImageObject",
+      "url": ogImageUrl,
+      "width": 1200,
+      "height": 630
+    }
+  },
+  {
+    "@type": "WebSite",
+    "@id": `${siteRoot}/#website`,
+    "url": siteRoot,
+    "name": "Quote Generator Free",
+    "publisher": {
+      "@id": `${siteRoot}/#organization`
+    }
+  }
+];
+
+if (canonicalPath && canonicalPath !== '/' && canonicalPath !== '') {
+  graphItems.push({
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": siteRoot
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": breadcrumbTitle || title,
+        "item": canonicalUrl
+      }
+    ]
+  });
+}
+
 const jsonLd = {
   "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "WebApplication",
-      "@id": `${canonicalUrl}/#webapp`,
-      "name": "Quote Generator Free",
-      "alternateName": [
-        "Quote Generator",
-        "Quotation Generator",
-        "Quotation Generator Software",
-        "Free Estimate Generator",
-        "Digital Quote Builder",
-        "PDF Quote Generator"
-      ],
-      "url": canonicalUrl,
-      "description": description,
-      "applicationCategory": "BusinessApplication",
-      "operatingSystem": "All",
-      "browserRequirements": "Requires JavaScript. Requires HTML5.",
-      "softwareVersion": "2.0.0",
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "USD"
-      },
-      "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": "4.9",
-        "reviewCount": "1280",
-        "bestRating": "5",
-        "worstRating": "1"
-      },
-      "featureList": [
-        "Universal Logo Engine supporting PNG, JPG, SVG, WebP, and GIF",
-        "Instant Real-Time A4 PDF Preview & Printable Quote Generator",
-        "100% Client-Side Private Generation without Server Data Storage",
-        "150+ Currencies and Multi-Tax Dynamic Calculation Engine",
-        "5 Designer Quote Templates with Custom Color Themes",
-        "Built-in Digital Signature Pad for Client Quote Approval",
-        "Lightweight CPQ Software Line Items and Discount Automation",
-        "Seamless Quote to Invoice Software Transition Data"
-      ]
-    },
-    {
-      "@type": "Organization",
-      "@id": `${canonicalUrl}/#organization`,
-      "name": "Quote Generator Free",
-      "url": canonicalUrl,
-      "logo": {
-        "@type": "ImageObject",
-        "url": ogImageUrl,
-        "width": 1200,
-        "height": 630
-      }
-    },
-    {
-      "@type": "WebSite",
-      "@id": `${canonicalUrl}/#website`,
-      "url": canonicalUrl,
-      "name": "Quote Generator Free",
-      "publisher": {
-        "@id": `${canonicalUrl}/#organization`
-      }
-    }
-  ]
+  "@graph": graphItems
 };
 ---
 
