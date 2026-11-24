@@ -1,19 +1,19 @@
-import React, { useState } from 'react';
-import type { QuoteData, CustomField } from '../../types/quote';
+import React from 'react';
+import type { QuoteData } from '../../types/quote';
 import { LogoUploader } from './LogoUploader';
 import { LineItemsEditor } from './LineItemsEditor';
 import { SignaturePad } from './SignaturePad';
 import { computeFinancials, formatMoney } from '../../utils/calculations';
-import { Plus, Trash2, ChevronDown, ChevronUp, FileText, User, Building, DollarSign, CreditCard } from 'lucide-react';
+import type { SiteUiDictionary } from '../../data/uiTranslations';
+import { Plus, Trash2, Building, User, DollarSign, CreditCard } from 'lucide-react';
 
 interface QuoteEditorProps {
   quote: QuoteData;
+  ui: SiteUiDictionary;
   onChange: (updated: QuoteData) => void;
 }
 
-export const QuoteEditor: React.FC<QuoteEditorProps> = ({ quote, onChange }) => {
-  const [activeSection, setActiveSection] = useState<'all' | string>('all');
-
+export const QuoteEditor: React.FC<QuoteEditorProps> = ({ quote, ui, onChange }) => {
   const updateMeta = (field: string, value: any) => {
     onChange({
       ...quote,
@@ -73,28 +73,11 @@ export const QuoteEditor: React.FC<QuoteEditorProps> = ({ quote, onChange }) => 
     });
   };
 
-  // Add / Remove custom fields for metadata
-  const addCustomMetaField = () => {
-    const newField: CustomField = {
-      id: 'field-' + Date.now(),
-      label: 'New Field',
-      value: ''
-    };
-    updateMeta('customFields', [...(quote.meta.customFields || []), newField]);
-  };
-
-  const removeCustomMetaField = (id: string) => {
-    updateMeta(
-      'customFields',
-      quote.meta.customFields.filter((f) => f.id !== id)
-    );
-  };
-
   // Tax Management
   const addTaxRow = () => {
     const newTax = {
-      id: 'tax-' + Date.now(),
-      name: 'Tax / GST',
+      id: 'tax-' + Date.now() + '-' + Math.random().toString(36).substring(2, 5),
+      name: 'Tax / VAT',
       rate: 10,
       amount: 0
     };
@@ -116,9 +99,9 @@ export const QuoteEditor: React.FC<QuoteEditorProps> = ({ quote, onChange }) => 
   };
 
   return (
-    <div className="space-y-6 text-xs text-neutral-800">
+    <div className="space-y-6 text-xs text-neutral-800 dark:text-neutral-200">
       {/* 1. Header & Logo */}
-      <div className="bg-white border border-neutral-200 rounded-xl p-5 shadow-xs space-y-4">
+      <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 sm:p-5 shadow-xs space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
           {/* Logo Uploader */}
           <LogoUploader
@@ -126,60 +109,68 @@ export const QuoteEditor: React.FC<QuoteEditorProps> = ({ quote, onChange }) => 
             onChange={(newBranding) => onChange({ ...quote, branding: newBranding })}
           />
 
-          {/* Document Title & Numbering */}
+          {/* Document Title & Metadata */}
           <div className="space-y-3">
             <div>
-              <label className="text-xs font-mono uppercase tracking-wider text-neutral-500 font-medium block mb-1">
-                Document Title
+              <label className="text-xs font-mono uppercase tracking-wider text-neutral-500 dark:text-neutral-400 font-medium block mb-1">
+                {ui.docTitleLabel}
               </label>
               <input
                 type="text"
                 value={quote.meta.title}
                 onChange={(e) => updateMeta('title', e.target.value)}
-                placeholder="QUOTE / ESTIMATE / PROPOSAL"
-                className="w-full text-base font-bold px-3 py-1.5 border border-neutral-200 rounded-md focus:border-neutral-900 focus:outline-hidden"
+                placeholder="QUOTE / ESTIMATE"
+                className="w-full text-base font-bold px-3 py-1.5 border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white rounded-md focus:border-neutral-900 dark:focus:border-neutral-400 focus:outline-hidden"
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="text-[11px] font-mono text-neutral-500 block mb-1">Quote #</label>
+                <label className="text-[11px] font-mono text-neutral-500 dark:text-neutral-400 block mb-1">
+                  {ui.quoteNumberLabel}
+                </label>
                 <input
                   type="text"
                   value={quote.meta.quoteNumber}
                   onChange={(e) => updateMeta('quoteNumber', e.target.value)}
-                  className="w-full font-mono text-xs px-2.5 py-1.5 border border-neutral-200 rounded-md focus:border-neutral-900"
+                  className="w-full font-mono text-xs px-2.5 py-1.5 border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white rounded-md focus:border-neutral-900"
                 />
               </div>
               <div>
-                <label className="text-[11px] font-mono text-neutral-500 block mb-1">P.O. Number</label>
+                <label className="text-[11px] font-mono text-neutral-500 dark:text-neutral-400 block mb-1">
+                  {ui.poNumberLabel}
+                </label>
                 <input
                   type="text"
                   placeholder="Optional PO#"
                   value={quote.meta.poNumber || ''}
                   onChange={(e) => updateMeta('poNumber', e.target.value)}
-                  className="w-full font-mono text-xs px-2.5 py-1.5 border border-neutral-200 rounded-md focus:border-neutral-900"
+                  className="w-full font-mono text-xs px-2.5 py-1.5 border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white rounded-md focus:border-neutral-900"
                 />
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="text-[11px] font-mono text-neutral-500 block mb-1">Date</label>
+                <label className="text-[11px] font-mono text-neutral-500 dark:text-neutral-400 block mb-1">
+                  {ui.dateLabel}
+                </label>
                 <input
                   type="date"
                   value={quote.meta.issueDate}
                   onChange={(e) => updateMeta('issueDate', e.target.value)}
-                  className="w-full font-mono text-xs px-2.5 py-1.5 border border-neutral-200 rounded-md focus:border-neutral-900"
+                  className="w-full font-mono text-xs px-2.5 py-1.5 border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white rounded-md focus:border-neutral-900"
                 />
               </div>
               <div>
-                <label className="text-[11px] font-mono text-neutral-500 block mb-1">Valid Until</label>
+                <label className="text-[11px] font-mono text-neutral-500 dark:text-neutral-400 block mb-1">
+                  {ui.validUntilLabel}
+                </label>
                 <input
                   type="date"
                   value={quote.meta.validUntil || ''}
                   onChange={(e) => updateMeta('validUntil', e.target.value)}
-                  className="w-full font-mono text-xs px-2.5 py-1.5 border border-neutral-200 rounded-md focus:border-neutral-900"
+                  className="w-full font-mono text-xs px-2.5 py-1.5 border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white rounded-md focus:border-neutral-900"
                 />
               </div>
             </div>
@@ -190,127 +181,129 @@ export const QuoteEditor: React.FC<QuoteEditorProps> = ({ quote, onChange }) => 
       {/* 2. From & To Details */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* From Box */}
-        <div className="bg-white border border-neutral-200 rounded-xl p-5 shadow-xs space-y-3">
-          <label className="text-xs font-mono uppercase tracking-wider text-neutral-500 font-medium flex items-center gap-1.5">
-            <Building className="w-3.5 h-3.5" /> From (Your Business)
+        <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 sm:p-5 shadow-xs space-y-3">
+          <label className="text-xs font-mono uppercase tracking-wider text-neutral-500 dark:text-neutral-400 font-medium flex items-center gap-1.5">
+            <Building className="w-3.5 h-3.5" /> {ui.fromTitle}
           </label>
           <input
             type="text"
-            placeholder="Your Business / Full Name"
+            placeholder={ui.fromNamePlaceholder}
             value={quote.from.name}
             onChange={(e) => updateFrom('name', e.target.value)}
-            className="w-full font-semibold text-sm px-3 py-1.5 border border-neutral-200 rounded-md focus:border-neutral-900"
+            className="w-full font-semibold text-sm px-3 py-1.5 border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white rounded-md focus:border-neutral-900"
           />
           <input
             type="email"
-            placeholder="Email address"
+            placeholder={ui.emailPlaceholder}
             value={quote.from.email}
             onChange={(e) => updateFrom('email', e.target.value)}
-            className="w-full text-xs px-2.5 py-1.5 border border-neutral-200 rounded-md focus:border-neutral-900"
+            className="w-full text-xs px-2.5 py-1.5 border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white rounded-md focus:border-neutral-900"
           />
           <input
             type="tel"
-            placeholder="Phone number"
+            placeholder={ui.phonePlaceholder}
             value={quote.from.phone}
             onChange={(e) => updateFrom('phone', e.target.value)}
-            className="w-full text-xs px-2.5 py-1.5 border border-neutral-200 rounded-md focus:border-neutral-900"
+            className="w-full text-xs px-2.5 py-1.5 border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white rounded-md focus:border-neutral-900"
           />
           <input
             type="text"
-            placeholder="Street address"
+            placeholder={ui.addressPlaceholder}
             value={quote.from.address}
             onChange={(e) => updateFrom('address', e.target.value)}
-            className="w-full text-xs px-2.5 py-1.5 border border-neutral-200 rounded-md focus:border-neutral-900"
+            className="w-full text-xs px-2.5 py-1.5 border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white rounded-md focus:border-neutral-900"
           />
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <input
               type="text"
-              placeholder="City, State, Zip"
+              placeholder={ui.cityZipPlaceholder}
               value={quote.from.cityStateZip}
               onChange={(e) => updateFrom('cityStateZip', e.target.value)}
-              className="w-full text-xs px-2.5 py-1.5 border border-neutral-200 rounded-md focus:border-neutral-900"
+              className="w-full text-xs px-2.5 py-1.5 border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white rounded-md focus:border-neutral-900"
             />
             <input
               type="text"
-              placeholder="Tax ID / VAT / GSTIN"
+              placeholder={ui.taxIdPlaceholder}
               value={quote.from.taxId}
               onChange={(e) => updateFrom('taxId', e.target.value)}
-              className="w-full text-xs font-mono px-2.5 py-1.5 border border-neutral-200 rounded-md focus:border-neutral-900"
+              className="w-full text-xs font-mono px-2.5 py-1.5 border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white rounded-md focus:border-neutral-900"
             />
           </div>
         </div>
 
         {/* To Box */}
-        <div className="bg-white border border-neutral-200 rounded-xl p-5 shadow-xs space-y-3">
+        <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 sm:p-5 shadow-xs space-y-3">
           <div className="flex items-center justify-between">
-            <label className="text-xs font-mono uppercase tracking-wider text-neutral-500 font-medium flex items-center gap-1.5">
-              <User className="w-3.5 h-3.5" /> Quote To (Client)
+            <label className="text-xs font-mono uppercase tracking-wider text-neutral-500 dark:text-neutral-400 font-medium flex items-center gap-1.5">
+              <User className="w-3.5 h-3.5" /> {ui.toTitle}
             </label>
-            <label className="flex items-center gap-1 text-[11px] text-neutral-500 cursor-pointer">
+            <label className="flex items-center gap-1 text-[11px] text-neutral-500 dark:text-neutral-400 cursor-pointer">
               <input
                 type="checkbox"
                 checked={quote.to.hasShippingAddress}
                 onChange={(e) => updateTo('hasShippingAddress', e.target.checked)}
-                className="rounded border-neutral-300 text-neutral-900 focus:ring-0 w-3 h-3"
+                className="rounded border-neutral-300 dark:border-neutral-700 text-neutral-900 focus:ring-0 w-3 h-3"
               />
-              <span>Ship To Address</span>
+              <span>{ui.shipToToggle}</span>
             </label>
           </div>
 
           <input
             type="text"
-            placeholder="Client or Company Name"
+            placeholder={ui.toNamePlaceholder}
             value={quote.to.name}
             onChange={(e) => updateTo('name', e.target.value)}
-            className="w-full font-semibold text-sm px-3 py-1.5 border border-neutral-200 rounded-md focus:border-neutral-900"
+            className="w-full font-semibold text-sm px-3 py-1.5 border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white rounded-md focus:border-neutral-900"
           />
           <input
             type="email"
-            placeholder="Client Email"
+            placeholder={ui.emailPlaceholder}
             value={quote.to.email}
             onChange={(e) => updateTo('email', e.target.value)}
-            className="w-full text-xs px-2.5 py-1.5 border border-neutral-200 rounded-md focus:border-neutral-900"
+            className="w-full text-xs px-2.5 py-1.5 border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white rounded-md focus:border-neutral-900"
           />
           <input
             type="tel"
-            placeholder="Client Phone"
+            placeholder={ui.phonePlaceholder}
             value={quote.to.phone}
             onChange={(e) => updateTo('phone', e.target.value)}
-            className="w-full text-xs px-2.5 py-1.5 border border-neutral-200 rounded-md focus:border-neutral-900"
+            className="w-full text-xs px-2.5 py-1.5 border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white rounded-md focus:border-neutral-900"
           />
           <input
             type="text"
-            placeholder="Client Address"
+            placeholder={ui.addressPlaceholder}
             value={quote.to.address}
             onChange={(e) => updateTo('address', e.target.value)}
-            className="w-full text-xs px-2.5 py-1.5 border border-neutral-200 rounded-md focus:border-neutral-900"
+            className="w-full text-xs px-2.5 py-1.5 border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white rounded-md focus:border-neutral-900"
           />
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <input
               type="text"
-              placeholder="City, State, Zip"
+              placeholder={ui.cityZipPlaceholder}
               value={quote.to.cityStateZip}
               onChange={(e) => updateTo('cityStateZip', e.target.value)}
-              className="w-full text-xs px-2.5 py-1.5 border border-neutral-200 rounded-md focus:border-neutral-900"
+              className="w-full text-xs px-2.5 py-1.5 border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white rounded-md focus:border-neutral-900"
             />
             <input
               type="text"
-              placeholder="Client Tax ID"
+              placeholder={ui.taxIdPlaceholder}
               value={quote.to.taxId}
               onChange={(e) => updateTo('taxId', e.target.value)}
-              className="w-full text-xs font-mono px-2.5 py-1.5 border border-neutral-200 rounded-md focus:border-neutral-900"
+              className="w-full text-xs font-mono px-2.5 py-1.5 border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white rounded-md focus:border-neutral-900"
             />
           </div>
 
           {quote.to.hasShippingAddress && (
-            <div className="pt-2 border-t border-neutral-100">
-              <label className="text-[10px] font-mono text-neutral-500 uppercase block mb-1">Shipping Destination</label>
+            <div className="pt-2 border-t border-neutral-100 dark:border-neutral-800">
+              <label className="text-[10px] font-mono text-neutral-500 dark:text-neutral-400 uppercase block mb-1">
+                {ui.shippingDestination}
+              </label>
               <textarea
                 rows={2}
                 placeholder="Specific site or delivery address..."
                 value={quote.to.shipToAddress || ''}
                 onChange={(e) => updateTo('shipToAddress', e.target.value)}
-                className="w-full text-xs px-2.5 py-1.5 border border-neutral-200 rounded-md"
+                className="w-full text-xs px-2.5 py-1.5 border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white rounded-md"
               />
             </div>
           )}
@@ -318,35 +311,36 @@ export const QuoteEditor: React.FC<QuoteEditorProps> = ({ quote, onChange }) => 
       </div>
 
       {/* 3. Line Items Editor */}
-      <div className="bg-white border border-neutral-200 rounded-xl p-5 shadow-xs">
+      <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 sm:p-5 shadow-xs">
         <LineItemsEditor
           items={quote.items}
           currency={quote.currency}
+          ui={ui}
           onChange={handleLineItemsChange}
         />
       </div>
 
       {/* 4. Financials Calculation Block */}
-      <div className="bg-white border border-neutral-200 rounded-xl p-5 shadow-xs space-y-4">
-        <label className="text-xs font-mono uppercase tracking-wider text-neutral-500 font-medium flex items-center gap-1.5">
-          <DollarSign className="w-3.5 h-3.5" /> Discounts, Taxes & Financials
+      <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 sm:p-5 shadow-xs space-y-4">
+        <label className="text-xs font-mono uppercase tracking-wider text-neutral-500 dark:text-neutral-400 font-medium flex items-center gap-1.5">
+          <DollarSign className="w-3.5 h-3.5" /> {ui.financialsTitle}
         </label>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           {/* Controls: Discount & Tax Options */}
           <div className="space-y-4">
             {/* Discount Control */}
-            <div className="p-3 bg-neutral-50 border border-neutral-200 rounded-md space-y-2">
+            <div className="p-3 bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-200 dark:border-neutral-700 rounded-md space-y-2">
               <div className="flex items-center justify-between">
-                <span className="font-medium text-neutral-700">Client Discount</span>
-                <div className="flex rounded border border-neutral-200 overflow-hidden bg-white text-[11px]">
+                <span className="font-medium text-neutral-700 dark:text-neutral-300">{ui.clientDiscount}</span>
+                <div className="flex rounded border border-neutral-200 dark:border-neutral-700 overflow-hidden bg-white dark:bg-neutral-800 text-[11px]">
                   <button
                     type="button"
                     onClick={() => recomputeFinancials({ discountType: 'percentage' })}
                     className={`px-2 py-0.5 ${
                       quote.financials.discountType === 'percentage'
-                        ? 'bg-neutral-900 text-white font-semibold'
-                        : 'text-neutral-600'
+                        ? 'bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 font-semibold'
+                        : 'text-neutral-600 dark:text-neutral-400'
                     }`}
                   >
                     %
@@ -356,11 +350,11 @@ export const QuoteEditor: React.FC<QuoteEditorProps> = ({ quote, onChange }) => 
                     onClick={() => recomputeFinancials({ discountType: 'fixed' })}
                     className={`px-2 py-0.5 ${
                       quote.financials.discountType === 'fixed'
-                        ? 'bg-neutral-900 text-white font-semibold'
-                        : 'text-neutral-600'
+                        ? 'bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 font-semibold'
+                        : 'text-neutral-600 dark:text-neutral-400'
                     }`}
                   >
-                    Fixed
+                    {ui.fixed}
                   </button>
                 </div>
               </div>
@@ -370,21 +364,21 @@ export const QuoteEditor: React.FC<QuoteEditorProps> = ({ quote, onChange }) => 
                 step="any"
                 placeholder={quote.financials.discountType === 'percentage' ? 'e.g. 10 (%)' : 'e.g. 150'}
                 value={quote.financials.discountValue === 0 ? '' : quote.financials.discountValue}
-                onChange={(e) => recomputeFinancials({ discountValue: Number(e.target.value) || 0 })}
-                className="w-full text-xs font-mono px-2.5 py-1.5 border border-neutral-200 rounded bg-white text-right"
+                onChange={(e) => recomputeFinancials({ discountValue: Math.max(0, Number(e.target.value) || 0) })}
+                className="w-full text-xs font-mono px-2.5 py-1.5 border border-neutral-200 dark:border-neutral-700 rounded bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white text-right"
               />
             </div>
 
             {/* Taxes Control */}
-            <div className="p-3 bg-neutral-50 border border-neutral-200 rounded-md space-y-2">
+            <div className="p-3 bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-200 dark:border-neutral-700 rounded-md space-y-2">
               <div className="flex items-center justify-between">
-                <span className="font-medium text-neutral-700">Taxes / VAT / GST</span>
+                <span className="font-medium text-neutral-700 dark:text-neutral-300">{ui.taxesTitle}</span>
                 <button
                   type="button"
                   onClick={addTaxRow}
-                  className="text-[11px] text-blue-600 hover:text-blue-800 font-medium flex items-center gap-0.5"
+                  className="text-[11px] text-blue-600 dark:text-blue-400 hover:text-blue-800 font-medium flex items-center gap-0.5"
                 >
-                  <Plus className="w-3 h-3" /> Add Tax Row
+                  <Plus className="w-3 h-3" /> {ui.btnAddTaxRow}
                 </button>
               </div>
 
@@ -394,7 +388,7 @@ export const QuoteEditor: React.FC<QuoteEditorProps> = ({ quote, onChange }) => 
                     type="text"
                     value={tax.name}
                     onChange={(e) => updateTaxRow(idx, 'name', e.target.value)}
-                    className="flex-1 text-xs px-2 py-1 border border-neutral-200 rounded bg-white"
+                    className="flex-1 text-xs px-2 py-1 border border-neutral-200 dark:border-neutral-700 rounded bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white"
                   />
                   <div className="flex items-center gap-1 w-24">
                     <input
@@ -402,8 +396,8 @@ export const QuoteEditor: React.FC<QuoteEditorProps> = ({ quote, onChange }) => 
                       min="0"
                       step="any"
                       value={tax.rate === 0 ? '' : tax.rate}
-                      onChange={(e) => updateTaxRow(idx, 'rate', Number(e.target.value) || 0)}
-                      className="w-full text-xs font-mono px-1.5 py-1 border border-neutral-200 rounded bg-white text-right"
+                      onChange={(e) => updateTaxRow(idx, 'rate', Math.max(0, Number(e.target.value) || 0))}
+                      className="w-full text-xs font-mono px-1.5 py-1 border border-neutral-200 dark:border-neutral-700 rounded bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white text-right"
                     />
                     <span className="text-[11px] text-neutral-500 font-mono">%</span>
                   </div>
@@ -419,78 +413,84 @@ export const QuoteEditor: React.FC<QuoteEditorProps> = ({ quote, onChange }) => 
             </div>
 
             {/* Shipping & Deposit */}
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="text-[11px] font-mono text-neutral-500 block mb-1">Shipping Fee</label>
+                <label className="text-[11px] font-mono text-neutral-500 dark:text-neutral-400 block mb-1">
+                  {ui.shippingFee}
+                </label>
                 <input
                   type="number"
                   min="0"
                   step="any"
                   value={quote.financials.shipping === 0 ? '' : quote.financials.shipping}
-                  onChange={(e) => recomputeFinancials({ shipping: Number(e.target.value) || 0 })}
-                  className="w-full text-xs font-mono px-2.5 py-1.5 border border-neutral-200 rounded text-right"
+                  onChange={(e) => recomputeFinancials({ shipping: Math.max(0, Number(e.target.value) || 0) })}
+                  className="w-full text-xs font-mono px-2.5 py-1.5 border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white rounded text-right"
                 />
               </div>
               <div>
-                <label className="text-[11px] font-mono text-neutral-500 block mb-1">Deposit / Amount Paid</label>
+                <label className="text-[11px] font-mono text-neutral-500 dark:text-neutral-400 block mb-1">
+                  {ui.depositPaid}
+                </label>
                 <input
                   type="number"
                   min="0"
                   step="any"
                   value={quote.financials.amountPaid === 0 ? '' : quote.financials.amountPaid}
-                  onChange={(e) => recomputeFinancials({ amountPaid: Number(e.target.value) || 0 })}
-                  className="w-full text-xs font-mono px-2.5 py-1.5 border border-neutral-200 rounded text-right"
+                  onChange={(e) => recomputeFinancials({ amountPaid: Math.max(0, Number(e.target.value) || 0) })}
+                  className="w-full text-xs font-mono px-2.5 py-1.5 border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white rounded text-right"
                 />
               </div>
             </div>
           </div>
 
           {/* Computed Summary Card */}
-          <div className="p-4 bg-neutral-50 border border-neutral-200 rounded-lg flex flex-col justify-between font-mono space-y-2">
+          <div className="p-4 bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-200 dark:border-neutral-700 rounded-lg flex flex-col justify-between font-mono space-y-2">
             <div className="space-y-1.5">
-              <div className="flex justify-between text-neutral-600">
-                <span className="font-sans">Subtotal:</span>
+              <div className="flex justify-between text-neutral-600 dark:text-neutral-400">
+                <span className="font-sans">{ui.subtotal}:</span>
                 <span>{formatMoney(quote.financials.subtotal, quote.currency)}</span>
               </div>
 
               {quote.financials.discountAmount > 0 && (
-                <div className="flex justify-between text-emerald-600">
+                <div className="flex justify-between text-emerald-600 dark:text-emerald-400">
                   <span className="font-sans">
-                    Discount ({quote.financials.discountType === 'percentage' ? `${quote.financials.discountValue}%` : 'Fixed'}):
+                    {ui.discount} ({quote.financials.discountType === 'percentage' ? `${quote.financials.discountValue}%` : ui.fixed}):
                   </span>
                   <span>-{formatMoney(quote.financials.discountAmount, quote.currency)}</span>
                 </div>
               )}
 
               {quote.financials.taxes.map((t) => (
-                <div key={t.id} className="flex justify-between text-neutral-600">
-                  <span className="font-sans">{t.name} ({t.rate}%):</span>
+                <div key={t.id} className="flex justify-between text-neutral-600 dark:text-neutral-400">
+                  <span className="font-sans">
+                    {t.name} ({t.rate}%):
+                  </span>
                   <span>{formatMoney(t.amount, quote.currency)}</span>
                 </div>
               ))}
 
               {quote.financials.shipping > 0 && (
-                <div className="flex justify-between text-neutral-600">
-                  <span className="font-sans">Shipping:</span>
+                <div className="flex justify-between text-neutral-600 dark:text-neutral-400">
+                  <span className="font-sans">{ui.shippingFee}:</span>
                   <span>{formatMoney(quote.financials.shipping, quote.currency)}</span>
                 </div>
               )}
             </div>
 
-            <div className="pt-3 border-t-2 border-neutral-900 space-y-1">
-              <div className="flex justify-between text-base font-bold text-neutral-950">
-                <span className="font-sans">Total:</span>
+            <div className="pt-3 border-t-2 border-neutral-900 dark:border-neutral-600 space-y-1">
+              <div className="flex justify-between text-base font-bold text-neutral-950 dark:text-white">
+                <span className="font-sans">{ui.total}:</span>
                 <span>{formatMoney(quote.financials.total, quote.currency)}</span>
               </div>
 
               {quote.financials.amountPaid > 0 && (
                 <>
-                  <div className="flex justify-between text-[11px] text-neutral-500">
-                    <span className="font-sans">Amount Paid:</span>
+                  <div className="flex justify-between text-[11px] text-neutral-500 dark:text-neutral-400">
+                    <span className="font-sans">{ui.amountPaid}:</span>
                     <span>{formatMoney(quote.financials.amountPaid, quote.currency)}</span>
                   </div>
-                  <div className="flex justify-between text-sm font-semibold text-neutral-900 pt-1 border-t border-neutral-200">
-                    <span className="font-sans">Balance Due:</span>
+                  <div className="flex justify-between text-sm font-semibold text-neutral-900 dark:text-white pt-1 border-t border-neutral-200 dark:border-neutral-700">
+                    <span className="font-sans">{ui.balanceDue}:</span>
                     <span>{formatMoney(quote.financials.balanceDue, quote.currency)}</span>
                   </div>
                 </>
@@ -501,64 +501,68 @@ export const QuoteEditor: React.FC<QuoteEditorProps> = ({ quote, onChange }) => 
       </div>
 
       {/* 5. Notes & Terms & Payment Wire Info */}
-      <div className="bg-white border border-neutral-200 rounded-xl p-5 shadow-xs space-y-4">
-        <label className="text-xs font-mono uppercase tracking-wider text-neutral-500 font-medium flex items-center gap-1.5">
-          <CreditCard className="w-3.5 h-3.5" /> Notes, Payment Terms & Wire Instructions
+      <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 sm:p-5 shadow-xs space-y-4">
+        <label className="text-xs font-mono uppercase tracking-wider text-neutral-500 dark:text-neutral-400 font-medium flex items-center gap-1.5">
+          <CreditCard className="w-3.5 h-3.5" /> {ui.notesAndTermsTitle}
         </label>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="text-[11px] font-mono text-neutral-500 block mb-1">Notes / Remarks</label>
+            <label className="text-[11px] font-mono text-neutral-500 dark:text-neutral-400 block mb-1">
+              {ui.notesLabel}
+            </label>
             <textarea
               rows={3}
-              placeholder="e.g. Thank you for your business. We look forward to working with you!"
+              placeholder={ui.notesPlaceholder}
               value={quote.payment.notes}
               onChange={(e) => updatePayment('notes', e.target.value)}
-              className="w-full text-xs p-2.5 border border-neutral-200 rounded-md"
+              className="w-full text-xs p-2.5 border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white rounded-md"
             />
           </div>
 
           <div>
-            <label className="text-[11px] font-mono text-neutral-500 block mb-1">Terms & Conditions</label>
+            <label className="text-[11px] font-mono text-neutral-500 dark:text-neutral-400 block mb-1">
+              {ui.termsLabel}
+            </label>
             <textarea
               rows={3}
-              placeholder="e.g. Payment due within 30 days. 50% advance deposit required for kickoff."
+              placeholder={ui.termsPlaceholder}
               value={quote.payment.terms}
               onChange={(e) => updatePayment('terms', e.target.value)}
-              className="w-full text-xs p-2.5 border border-neutral-200 rounded-md"
+              className="w-full text-xs p-2.5 border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white rounded-md"
             />
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-neutral-100">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-neutral-100 dark:border-neutral-800">
           <div>
-            <label className="text-[10px] font-mono text-neutral-400 block mb-0.5">Bank Name</label>
+            <label className="text-[10px] font-mono text-neutral-400 block mb-0.5">{ui.bankNameLabel}</label>
             <input
               type="text"
               placeholder="e.g. Chase / Barclays"
               value={quote.payment.bankName}
               onChange={(e) => updatePayment('bankName', e.target.value)}
-              className="w-full text-xs px-2.5 py-1.5 border border-neutral-200 rounded-md"
+              className="w-full text-xs px-2.5 py-1.5 border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white rounded-md"
             />
           </div>
           <div>
-            <label className="text-[10px] font-mono text-neutral-400 block mb-0.5">Account / Wire Number</label>
+            <label className="text-[10px] font-mono text-neutral-400 block mb-0.5">{ui.accountNumberLabel}</label>
             <input
               type="text"
               placeholder="e.g. 123456789"
               value={quote.payment.accountNumber}
               onChange={(e) => updatePayment('accountNumber', e.target.value)}
-              className="w-full text-xs px-2.5 py-1.5 border border-neutral-200 rounded-md font-mono"
+              className="w-full text-xs px-2.5 py-1.5 border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white rounded-md font-mono"
             />
           </div>
           <div>
-            <label className="text-[10px] font-mono text-neutral-400 block mb-0.5">Payment Link / Stripe / PayPal</label>
+            <label className="text-[10px] font-mono text-neutral-400 block mb-0.5">{ui.paymentLinkLabel}</label>
             <input
               type="text"
               placeholder="https://pay.yoursite.com"
               value={quote.payment.paymentLink}
               onChange={(e) => updatePayment('paymentLink', e.target.value)}
-              className="w-full text-xs px-2.5 py-1.5 border border-neutral-200 rounded-md"
+              className="w-full text-xs px-2.5 py-1.5 border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white rounded-md"
             />
           </div>
         </div>
@@ -568,6 +572,18 @@ export const QuoteEditor: React.FC<QuoteEditorProps> = ({ quote, onChange }) => 
       <SignaturePad
         signature={quote.signature}
         onChange={(newSig) => onChange({ ...quote, signature: newSig })}
+        labels={{
+          signatureTitle: ui.signatureTitle,
+          includeSignature: ui.includeSignature,
+          typeName: ui.typeName,
+          drawSignature: ui.drawSignature,
+          clear: ui.clear,
+          drawHint: ui.drawHint,
+          typePlaceholder: ui.typePlaceholder,
+          signerTitle: ui.signerTitle,
+          signedDate: ui.signedDate,
+          statement: ui.statement
+        }}
       />
     </div>
   );

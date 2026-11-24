@@ -43,10 +43,36 @@ const jsonLd = {
 <html lang="en" class="scroll-smooth">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" href="/favicon.ico" />
     <meta name="generator" content={Astro.generator} />
+
+    <!-- Instant Dark Mode Detection Script (Prevents FOUC) -->
+    <script is:inline>
+      (function() {
+        try {
+          const stored = localStorage.getItem('theme');
+          const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          if (stored === 'dark' || (!stored && systemDark)) {
+            document.documentElement.classList.add('dark');
+          } else {
+            document.documentElement.classList.remove('dark');
+          }
+
+          // Auto-respond to system theme changes if user hasn't explicitly set preference
+          window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
+            if (!localStorage.getItem('theme')) {
+              if (e.matches) {
+                document.documentElement.classList.add('dark');
+              } else {
+                document.documentElement.classList.remove('dark');
+              }
+            }
+          });
+        } catch (e) {}
+      })();
+    </script>
 
     <!-- SEO Meta Tags -->
     <title>{title}</title>
@@ -67,7 +93,7 @@ const jsonLd = {
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
 
-    <!-- Web Fonts (Geist & Geist Mono from Google Fonts) -->
+    <!-- Web Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -75,7 +101,7 @@ const jsonLd = {
     <!-- Schema.org JSON-LD -->
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
   </head>
-  <body class="bg-[#fafafa] text-[#171717] min-h-screen flex flex-col font-sans selection:bg-neutral-900 selection:text-white">
+  <body class="bg-[#fafafa] dark:bg-[#09090b] text-[#171717] dark:text-[#ededed] min-h-screen flex flex-col font-sans selection:bg-neutral-900 dark:selection:bg-neutral-100 selection:text-white dark:selection:text-neutral-900 transition-colors duration-200">
     <slot />
   </body>
 </html>

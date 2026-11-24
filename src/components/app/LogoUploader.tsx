@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { Upload, X, AlignLeft, AlignCenter, AlignRight, Sliders, Image as ImageIcon } from 'lucide-react';
+import { Upload, X, AlignLeft, AlignCenter, AlignRight, Image as ImageIcon } from 'lucide-react';
 import { processLogoFile } from '../../utils/logoProcessor';
 import type { Branding } from '../../types/quote';
 
@@ -47,7 +47,7 @@ export const LogoUploader: React.FC<LogoUploaderProps> = ({ branding, onChange }
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <label className="text-xs font-mono uppercase tracking-wider text-neutral-500 font-medium flex items-center gap-1.5">
+        <label className="text-xs font-mono uppercase tracking-wider text-neutral-500 dark:text-neutral-400 font-medium flex items-center gap-1.5">
           <ImageIcon className="w-3.5 h-3.5" /> Company Logo
         </label>
         {branding.logoUrl && (
@@ -63,14 +63,17 @@ export const LogoUploader: React.FC<LogoUploaderProps> = ({ branding, onChange }
 
       {!branding.logoUrl ? (
         <div
-          onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+          onDragOver={(e) => {
+            e.preventDefault();
+            setIsDragging(true);
+          }}
           onDragLeave={() => setIsDragging(false)}
           onDrop={handleDrop}
           onClick={() => fileInputRef.current?.click()}
           className={`border border-dashed rounded-md p-4 flex flex-col items-center justify-center cursor-pointer transition-colors ${
             isDragging
-              ? 'border-blue-500 bg-blue-50/50'
-              : 'border-neutral-300 hover:border-neutral-400 bg-neutral-50/50'
+              ? 'border-blue-500 bg-blue-50/50 dark:bg-blue-950/20'
+              : 'border-neutral-300 dark:border-neutral-700 hover:border-neutral-400 dark:hover:border-neutral-600 bg-neutral-50/50 dark:bg-neutral-800/40'
           }`}
         >
           <input
@@ -85,13 +88,13 @@ export const LogoUploader: React.FC<LogoUploaderProps> = ({ branding, onChange }
             }}
           />
           <Upload className="w-5 h-5 text-neutral-400 mb-1.5" />
-          <p className="text-xs font-medium text-neutral-700">Click to upload or drag & drop</p>
-          <p className="text-[11px] text-neutral-400 mt-0.5">PNG, JPG, SVG, WebP, GIF (Max 8MB)</p>
-          {errorMsg && <p className="text-xs text-red-600 mt-2">{errorMsg}</p>}
+          <p className="text-xs font-medium text-neutral-700 dark:text-neutral-300">Click to upload or drag & drop</p>
+          <p className="text-[11px] text-neutral-400 dark:text-neutral-500 mt-0.5">PNG, JPG, SVG, WebP, GIF (Max 8MB)</p>
+          {errorMsg && <p className="text-xs text-red-600 dark:text-red-400 mt-2">{errorMsg}</p>}
         </div>
       ) : (
-        <div className="bg-white border border-neutral-200 rounded-md p-3 space-y-3">
-          <div className="flex items-center justify-center p-2 bg-neutral-50 rounded border border-neutral-100 max-h-28 overflow-hidden">
+        <div className="bg-white dark:bg-neutral-800/70 border border-neutral-200 dark:border-neutral-700 rounded-md p-3 space-y-3">
+          <div className="flex items-center justify-center p-2 bg-neutral-50 dark:bg-neutral-900 rounded border border-neutral-100 dark:border-neutral-800 max-h-28 overflow-hidden">
             <img
               src={branding.logoUrl}
               alt="Uploaded company logo"
@@ -100,10 +103,10 @@ export const LogoUploader: React.FC<LogoUploaderProps> = ({ branding, onChange }
             />
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1 border-t border-neutral-100 text-xs">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1 border-t border-neutral-100 dark:border-neutral-700 text-xs">
             {/* Width Slider */}
             <div className="space-y-1">
-              <div className="flex justify-between text-[11px] text-neutral-500 font-mono">
+              <div className="flex justify-between text-[11px] text-neutral-500 dark:text-neutral-400 font-mono">
                 <span>Size:</span>
                 <span>{branding.logoWidth}px</span>
               </div>
@@ -114,23 +117,23 @@ export const LogoUploader: React.FC<LogoUploaderProps> = ({ branding, onChange }
                 step="5"
                 value={branding.logoWidth}
                 onChange={(e) => onChange({ ...branding, logoWidth: Number(e.target.value) })}
-                className="w-full accent-neutral-900 cursor-pointer h-1.5 bg-neutral-200 rounded-lg appearance-none"
+                className="w-full accent-neutral-900 dark:accent-neutral-100 cursor-pointer h-1.5 bg-neutral-200 dark:bg-neutral-700 rounded-lg appearance-none"
               />
             </div>
 
             {/* Alignment */}
             <div className="space-y-1">
-              <span className="text-[11px] text-neutral-500 font-mono">Alignment:</span>
-              <div className="flex rounded-md border border-neutral-200 overflow-hidden bg-neutral-50 p-0.5">
+              <span className="text-[11px] text-neutral-500 dark:text-neutral-400 font-mono">Alignment:</span>
+              <div className="flex rounded-md border border-neutral-200 dark:border-neutral-700 overflow-hidden bg-neutral-50 dark:bg-neutral-900 p-0.5">
                 {(['left', 'center', 'right'] as const).map((align) => (
                   <button
                     key={align}
                     type="button"
                     onClick={() => onChange({ ...branding, logoAlignment: align })}
-                    className={`flex-1 py-1 flex items-center justify-center rounded text-neutral-600 transition-colors ${
+                    className={`flex-1 py-1 flex items-center justify-center rounded text-neutral-600 dark:text-neutral-400 transition-colors ${
                       branding.logoAlignment === align
-                        ? 'bg-white shadow-xs text-neutral-900 font-medium'
-                        : 'hover:text-neutral-900'
+                        ? 'bg-white dark:bg-neutral-800 shadow-xs text-neutral-900 dark:text-neutral-100 font-medium'
+                        : 'hover:text-neutral-900 dark:hover:text-neutral-200'
                     }`}
                   >
                     {align === 'left' && <AlignLeft className="w-3.5 h-3.5" />}

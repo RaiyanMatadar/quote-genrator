@@ -53,14 +53,14 @@ export function createDefaultQuote(): QuoteData {
   const defaultFinancials = computeFinancials(
     defaultItems,
     'percentage',
-    5, // 5% initial client discount
+    5,
     [{ id: 'tax-1', name: 'Tax / VAT', rate: 10, amount: 0 }],
     0,
-    1500 // 1500 deposit
+    1500
   );
 
   return {
-    id: 'quote-default',
+    id: 'quote-' + Date.now(),
     lastUpdated: new Date().toISOString(),
     currency: 'USD',
     language: 'en',
@@ -189,36 +189,4 @@ export function loadQuoteFromHistory(id: string): QuoteData | null {
     console.warn('Failed to load quote from history:', e);
   }
   return null;
-}
-
-export function exportQuoteAsJSON(quote: QuoteData): void {
-  if (typeof window === 'undefined') return;
-  const jsonStr = JSON.stringify(quote, null, 2);
-  const blob = new Blob([jsonStr], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `${quote.meta.quoteNumber || 'quote'}_backup.json`;
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
-export async function importQuoteFromJSON(file: File): Promise<QuoteData> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const parsed = JSON.parse(e.target?.result as string);
-        if (parsed && parsed.items && parsed.from && parsed.to) {
-          resolve(parsed);
-        } else {
-          reject(new Error('Invalid quotation backup file structure.'));
-        }
-      } catch {
-        reject(new Error('Unable to parse JSON file.'));
-      }
-    };
-    reader.onerror = () => reject(new Error('Error reading backup file.'));
-    reader.readAsText(file);
-  });
 }
