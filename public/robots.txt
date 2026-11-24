@@ -5,4 +5,5 @@ Allow: /
 Host: https://quotegeneratorfree.com
 
 # Sitemaps
+Sitemap: https://quotegeneratorfree.com/sitemap-index.xml
 Sitemap: https://quotegeneratorfree.com/sitemap.xml
