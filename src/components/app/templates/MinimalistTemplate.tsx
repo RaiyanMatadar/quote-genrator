@@ -12,10 +12,10 @@ export const MinimalistTemplate: React.FC<TemplateProps> = ({ quote }) => {
   const accent = quote.branding.accentColor || '#171717';
 
   return (
-    <div className="text-neutral-900 bg-white font-sans text-xs leading-relaxed p-8 sm:p-12 w-full max-w-[210mm] mx-auto min-h-[297mm] flex flex-col justify-between">
+    <div className="text-neutral-900 bg-white font-sans text-xs leading-relaxed p-12 w-[794px] min-w-[794px] max-w-[794px] min-h-[1123px] mx-auto box-border flex flex-col justify-between">
       <div>
         {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start gap-6 pb-8 border-b border-neutral-200">
+        <div className="flex flex-row justify-between items-start gap-6 pb-8 border-b border-neutral-200">
           <div>
             {quote.branding.logoUrl ? (
               <div
@@ -45,7 +45,7 @@ export const MinimalistTemplate: React.FC<TemplateProps> = ({ quote }) => {
             </div>
           </div>
 
-          <div className="text-left sm:text-right">
+          <div className="text-right">
             <h2
               className="text-2xl font-bold tracking-tight mb-2 uppercase"
               style={{ color: accent }}
@@ -66,7 +66,7 @@ export const MinimalistTemplate: React.FC<TemplateProps> = ({ quote }) => {
         </div>
 
         {/* Bill To & Ship To */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 py-6 border-b border-neutral-100">
+        <div className="grid grid-cols-2 gap-8 py-6 border-b border-neutral-100">
           <div>
             <span className="text-[10px] font-mono uppercase tracking-wider text-neutral-400 block mb-1">
               {t.to}
@@ -127,9 +127,9 @@ export const MinimalistTemplate: React.FC<TemplateProps> = ({ quote }) => {
         </div>
 
         {/* Financials & Calculation Breakdown */}
-        <div className="flex flex-col sm:flex-row justify-between items-start gap-8 pt-4 pb-8 border-t border-neutral-200">
+        <div className="flex flex-row justify-between items-start gap-8 pt-4 pb-8 border-t border-neutral-200">
           {/* Notes & Terms on Left */}
-          <div className="w-full sm:w-1/2 space-y-4">
+          <div className="w-1/2 space-y-4">
             {quote.payment.notes && (
               <div>
                 <span className="text-[10px] font-mono uppercase tracking-wider text-neutral-400 block mb-1">
@@ -167,7 +167,7 @@ export const MinimalistTemplate: React.FC<TemplateProps> = ({ quote }) => {
           </div>
 
           {/* Totals Table on Right */}
-          <div className="w-full sm:w-2/5 space-y-2 text-xs font-mono">
+          <div className="w-2/5 space-y-2 text-xs font-mono">
             <div className="flex justify-between py-1 text-neutral-600">
               <span className="font-sans">{t.subtotal}</span>
               <span>{formatMoney(quote.financials.subtotal, quote.currency)}</span>

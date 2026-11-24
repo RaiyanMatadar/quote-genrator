@@ -12,13 +12,13 @@ export const CreativeTemplate: React.FC<TemplateProps> = ({ quote }) => {
   const accent = quote.branding.accentColor || '#7928ca';
 
   return (
-    <div className="text-neutral-900 bg-white font-sans text-xs leading-relaxed p-8 sm:p-12 w-full max-w-[210mm] mx-auto min-h-[297mm] flex flex-col justify-between">
+    <div className="text-neutral-900 bg-white font-sans text-xs leading-relaxed p-12 w-[794px] min-w-[794px] max-w-[794px] min-h-[1123px] mx-auto box-border flex flex-col justify-between">
       <div>
         {/* Creative Top Accent Line */}
         <div className="h-2 w-full rounded-full mb-8" style={{ backgroundColor: accent }} />
 
         {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start gap-6 pb-6">
+        <div className="flex flex-row justify-between items-start gap-6 pb-6">
           <div>
             {quote.branding.logoUrl && (
               <img
@@ -32,7 +32,7 @@ export const CreativeTemplate: React.FC<TemplateProps> = ({ quote }) => {
             <p className="text-neutral-500 text-[11px]">{quote.from.email} · {quote.from.phone}</p>
           </div>
 
-          <div className="text-left sm:text-right bg-neutral-900 text-white p-4 rounded-xl min-w-48">
+          <div className="text-right bg-neutral-900 text-white p-4 rounded-xl min-w-48">
             <span className="text-[10px] font-mono uppercase tracking-wider text-neutral-400 block">
               {quote.meta.title || t.quote}
             </span>
@@ -42,7 +42,7 @@ export const CreativeTemplate: React.FC<TemplateProps> = ({ quote }) => {
         </div>
 
         {/* Addresses in Pill Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 my-6">
+        <div className="grid grid-cols-2 gap-4 my-6">
           <div className="p-4 rounded-xl bg-neutral-50 border border-neutral-100">
             <span className="text-[10px] font-mono uppercase tracking-wider text-neutral-400 block mb-1">{t.from}</span>
             <p className="font-bold text-neutral-900">{quote.from.name}</p>
@@ -89,8 +89,8 @@ export const CreativeTemplate: React.FC<TemplateProps> = ({ quote }) => {
         </div>
 
         {/* Bottom Details & Totals */}
-        <div className="flex flex-col sm:flex-row justify-between items-start gap-8 pt-6 border-t-2 border-neutral-900">
-          <div className="w-full sm:w-1/2 space-y-3">
+        <div className="flex flex-row justify-between items-start gap-8 pt-6 border-t-2 border-neutral-900">
+          <div className="w-1/2 space-y-3">
             {quote.payment.notes && (
               <div>
                 <span className="text-[10px] font-mono uppercase tracking-wider text-neutral-400 block mb-0.5">{t.notes}</span>
@@ -105,7 +105,7 @@ export const CreativeTemplate: React.FC<TemplateProps> = ({ quote }) => {
             )}
           </div>
 
-          <div className="w-full sm:w-2/5 space-y-1.5 text-xs font-mono">
+          <div className="w-2/5 space-y-1.5 text-xs font-mono">
             <div className="flex justify-between py-1 text-neutral-600">
               <span className="font-sans">{t.subtotal}</span>
               <span>{formatMoney(quote.financials.subtotal, quote.currency)}</span>

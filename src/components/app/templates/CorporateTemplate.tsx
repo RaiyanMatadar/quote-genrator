@@ -12,11 +12,11 @@ export const CorporateTemplate: React.FC<TemplateProps> = ({ quote }) => {
   const accent = quote.branding.accentColor || '#171717';
 
   return (
-    <div className="text-neutral-900 bg-white font-sans text-xs leading-relaxed p-8 sm:p-12 w-full max-w-[210mm] mx-auto min-h-[297mm] flex flex-col justify-between shadow-xs">
+    <div className="text-neutral-900 bg-white font-sans text-xs leading-relaxed p-12 w-[794px] min-w-[794px] max-w-[794px] min-h-[1123px] mx-auto box-border flex flex-col justify-between shadow-xs">
       <div>
         {/* Solid Header Banner */}
         <div
-          className="p-6 rounded-t-md text-white mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
+          className="p-6 rounded-t-md text-white mb-8 flex flex-row justify-between items-center gap-4"
           style={{ backgroundColor: accent }}
         >
           <div className="flex items-center gap-4">
@@ -36,14 +36,14 @@ export const CorporateTemplate: React.FC<TemplateProps> = ({ quote }) => {
             </div>
           </div>
 
-          <div className="text-left sm:text-right">
+          <div className="text-right">
             <h2 className="text-2xl font-black uppercase tracking-wider">{quote.meta.title || t.quote}</h2>
             <p className="font-mono text-xs text-white/90 font-medium">#{quote.meta.quoteNumber}</p>
           </div>
         </div>
 
         {/* Meta Bar */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-3 bg-neutral-100 rounded-md font-mono text-[11px] mb-8">
+        <div className="grid grid-cols-4 gap-4 p-3 bg-neutral-100 rounded-md font-mono text-[11px] mb-8">
           <div>
             <span className="text-neutral-500 font-sans block text-[10px] uppercase">{t.date}</span>
             <span className="font-semibold">{quote.meta.issueDate}</span>
@@ -63,7 +63,7 @@ export const CorporateTemplate: React.FC<TemplateProps> = ({ quote }) => {
         </div>
 
         {/* Two Column Addresses */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
+        <div className="grid grid-cols-2 gap-6 mb-8">
           <div className="p-4 rounded-md border border-neutral-200 bg-neutral-50/50">
             <span className="text-[10px] font-mono uppercase font-bold text-neutral-500 block mb-1">
               {t.from}
@@ -126,8 +126,8 @@ export const CorporateTemplate: React.FC<TemplateProps> = ({ quote }) => {
         </div>
 
         {/* Corporate Financial Box */}
-        <div className="flex flex-col sm:flex-row justify-between items-start gap-8 mb-8">
-          <div className="w-full sm:w-1/2 space-y-4">
+        <div className="flex flex-row justify-between items-start gap-8 mb-8">
+          <div className="w-1/2 space-y-4">
             {quote.payment.notes && (
               <div>
                 <span className="font-mono text-[10px] uppercase tracking-wider text-neutral-500 font-bold block mb-1">
@@ -146,7 +146,7 @@ export const CorporateTemplate: React.FC<TemplateProps> = ({ quote }) => {
             )}
           </div>
 
-          <div className="w-full sm:w-2/5 p-4 rounded-md bg-neutral-50 border border-neutral-200 space-y-2 text-xs font-mono">
+          <div className="w-2/5 p-4 rounded-md bg-neutral-50 border border-neutral-200 space-y-2 text-xs font-mono">
             <div className="flex justify-between py-1 text-neutral-600">
               <span className="font-sans">{t.subtotal}:</span>
               <span>{formatMoney(quote.financials.subtotal, quote.currency)}</span>

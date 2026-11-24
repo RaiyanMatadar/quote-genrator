@@ -75,8 +75,8 @@ export const PdfViewerModal: React.FC<PdfViewerModalProps> = ({
     ) => {
       const scaledW = a4WidthPx * currentScale;
       const scaledH = a4HeightPx * currentScale;
-      const paddingX = 48; // Margin around document inside viewer
-      const paddingY = 48;
+      const paddingX = viewportW < 640 ? 12 : 48; // Margin around document inside viewer
+      const paddingY = viewportW < 640 ? 24 : 48;
 
       let clampedX = targetX;
       let clampedY = targetY;
@@ -114,14 +114,16 @@ export const PdfViewerModal: React.FC<PdfViewerModalProps> = ({
     const vW = viewportRef.current.clientWidth;
     const vH = viewportRef.current.clientHeight;
 
-    // Available space accounting for margins and floating toolbar
-    const availableW = Math.max(300, vW - 64);
-    const availableH = Math.max(400, vH - 120);
+    // Available space accounting for margins and floating toolbar on mobile vs desktop
+    const marginX = vW < 640 ? 16 : 64;
+    const marginY = vW < 640 ? 70 : 120;
+    const availableW = Math.max(180, vW - marginX);
+    const availableH = Math.max(260, vH - marginY);
 
     const scaleW = availableW / a4WidthPx;
     const scaleH = availableH / a4HeightPx;
-    // Fit to entire page comfortably
-    const initialFit = Math.max(0.4, Math.min(1.2, Math.min(scaleW, scaleH)));
+    // Fit to entire page comfortably (down to 0.25 on small mobile screens)
+    const initialFit = Math.max(0.25, Math.min(1.2, Math.min(scaleW, scaleH)));
     const roundedFit = Number(initialFit.toFixed(2));
 
     setFitScale(roundedFit);
@@ -218,7 +220,7 @@ export const PdfViewerModal: React.FC<PdfViewerModalProps> = ({
     const vW = viewportRef.current.clientWidth;
     const vH = viewportRef.current.clientHeight;
 
-    const nextScale = Math.max(0.4, Math.min(3.5, Number((scale + delta).toFixed(2))));
+    const nextScale = Math.max(0.25, Math.min(3.5, Number((scale + delta).toFixed(2))));
     // Center point of viewport as focal point
     const centerX = vW / 2;
     const centerY = vH / 2;
@@ -323,7 +325,7 @@ export const PdfViewerModal: React.FC<PdfViewerModalProps> = ({
       if (pinchRef.current.initialDist > 0) {
         const factor = dist / pinchRef.current.initialDist;
         const targetScale = Math.max(
-          0.4,
+          0.25,
           Math.min(3.5, Number((pinchRef.current.initialScale * factor).toFixed(2)))
         );
 

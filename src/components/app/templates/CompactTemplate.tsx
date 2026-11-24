@@ -12,7 +12,7 @@ export const CompactTemplate: React.FC<TemplateProps> = ({ quote }) => {
   const accent = quote.branding.accentColor || '#171717';
 
   return (
-    <div className="text-neutral-900 bg-white font-mono text-[11px] leading-tight p-6 sm:p-8 w-full max-w-[210mm] mx-auto min-h-[297mm] flex flex-col justify-between border border-neutral-300">
+    <div className="text-neutral-900 bg-white font-mono text-[11px] leading-tight p-8 w-[794px] min-w-[794px] max-w-[794px] min-h-[1123px] mx-auto box-border flex flex-col justify-between border border-neutral-300">
       <div>
         {/* Compact Spec-Sheet Top Bar */}
         <div className="border-b border-neutral-300 pb-4 mb-4 flex justify-between items-start">

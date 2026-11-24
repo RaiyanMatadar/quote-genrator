@@ -22,29 +22,51 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({ quote, ui, onNotify 
   const a4WidthPx = 794; // 210mm at 96 DPI
   const a4HeightPx = 1123; // 297mm
 
-  // Auto-fit zoom on mount and window resize for small screens
+  // Auto-fit zoom on mount, container resize, and window resize for small screens
   useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
     const autoScale = () => {
-      if (containerRef.current) {
-        const availableW = containerRef.current.clientWidth - 32;
-        if (availableW < a4WidthPx) {
-          const autoZoom = Math.max(0.35, Math.min(1, availableW / a4WidthPx));
-          setZoomLevel(Number(autoZoom.toFixed(2)));
-        } else {
-          setZoomLevel(0.85);
-        }
+      const containerW = el.clientWidth;
+      if (containerW <= 0) return;
+
+      // Minimal margin on mobile (16px total) vs desktop (32px)
+      const padding = containerW < 640 ? 16 : 32;
+      const availableW = containerW - padding;
+
+      if (availableW < a4WidthPx) {
+        // Accurately fit down to 320px screens (~270-280px available)
+        const autoZoom = Math.max(0.25, Math.min(1, availableW / a4WidthPx));
+        setZoomLevel(Number(autoZoom.toFixed(2)));
+      } else {
+        setZoomLevel(0.85);
       }
     };
 
     autoScale();
+
+    let ro: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== 'undefined') {
+      ro = new ResizeObserver(() => {
+        autoScale();
+      });
+      ro.observe(el);
+    }
+
     window.addEventListener('resize', autoScale);
-    return () => window.removeEventListener('resize', autoScale);
+    return () => {
+      if (ro) ro.disconnect();
+      window.removeEventListener('resize', autoScale);
+    };
   }, []);
 
   const handleFitWidth = () => {
     if (containerRef.current) {
-      const availableW = containerRef.current.clientWidth - 32;
-      const fitZoom = Math.max(0.35, Math.min(1.2, availableW / a4WidthPx));
+      const containerW = containerRef.current.clientWidth;
+      const padding = containerW < 640 ? 16 : 32;
+      const availableW = containerW - padding;
+      const fitZoom = Math.max(0.25, Math.min(1.2, availableW / a4WidthPx));
       setZoomLevel(Number(fitZoom.toFixed(2)));
     }
   };
@@ -145,7 +167,7 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({ quote, ui, onNotify 
             height: `${effectiveHeight}px`,
             position: 'relative'
           }}
-          className="shadow-xl rounded-sm print-sheet shrink-0 transition-all duration-150 cursor-pointer group-hover:ring-2 lg:group-hover:ring-neutral-400/50 dark:lg:group-hover:ring-neutral-600/50"
+          className="shadow-xl rounded-sm print-sheet shrink-0 transition-all duration-150 cursor-pointer group-hover:ring-2 lg:group-hover:ring-neutral-400/50 dark:lg:group-hover:ring-neutral-600/50 mx-auto"
           title="Click to open Full-Screen Google Drive Viewer"
         >
           <div

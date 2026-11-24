@@ -12,10 +12,10 @@ export const NordicTemplate: React.FC<TemplateProps> = ({ quote }) => {
   const accent = quote.branding.accentColor || '#10b981';
 
   return (
-    <div className="text-neutral-800 bg-[#fafafa] font-sans text-xs leading-relaxed p-8 sm:p-12 w-full max-w-[210mm] mx-auto min-h-[297mm] flex flex-col justify-between">
+    <div className="text-neutral-800 bg-[#fafafa] font-sans text-xs leading-relaxed p-12 w-[794px] min-w-[794px] max-w-[794px] min-h-[1123px] mx-auto box-border flex flex-col justify-between">
       <div>
         {/* Soft Nordic Header */}
-        <div className="bg-white p-6 rounded-2xl border border-neutral-200/80 mb-6 flex flex-col sm:flex-row justify-between items-start gap-4">
+        <div className="bg-white p-6 rounded-2xl border border-neutral-200/80 mb-6 flex flex-row justify-between items-start gap-4">
           <div>
             {quote.branding.logoUrl && (
               <img
@@ -29,7 +29,7 @@ export const NordicTemplate: React.FC<TemplateProps> = ({ quote }) => {
             <p className="text-neutral-500 text-[11px]">{quote.from.address} · {quote.from.cityStateZip}</p>
           </div>
 
-          <div className="text-left sm:text-right">
+          <div className="text-right">
             <span
               className="inline-block px-3 py-1 rounded-full text-white text-[10px] font-mono uppercase tracking-widest font-semibold mb-2"
               style={{ backgroundColor: accent }}
@@ -83,7 +83,7 @@ export const NordicTemplate: React.FC<TemplateProps> = ({ quote }) => {
         </div>
 
         {/* Totals & Notes */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+        <div className="grid grid-cols-2 gap-6 mb-6">
           <div className="bg-white p-6 rounded-2xl border border-neutral-200/80 space-y-3">
             {quote.payment.notes && (
               <div>
