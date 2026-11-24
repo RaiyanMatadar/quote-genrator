@@ -9,11 +9,13 @@ export function initLanguageSystem() {
     document.documentElement.lang = lang;
     document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
 
-    // 2. Update global lang select element if present
-    const select = document.getElementById('global-lang-select') as HTMLSelectElement | null;
-    if (select && select.value !== lang) {
-      select.value = lang;
-    }
+    // 2. Update global lang select elements if present
+    const selects = document.querySelectorAll<HTMLSelectElement>('.global-lang-select, #global-lang-select, #global-lang-select-mobile');
+    selects.forEach((sel) => {
+      if (sel && sel.value !== lang) {
+        sel.value = lang;
+      }
+    });
 
     // 3. Update all data-i18n text nodes
     const elements = document.querySelectorAll<HTMLElement>('[data-i18n]');
@@ -38,11 +40,11 @@ export function initLanguageSystem() {
   const savedLang = (typeof window !== 'undefined' && localStorage.getItem('site_language')) || 'en';
   applyLanguage(savedLang);
 
-  // Listen to changes from Header select
-  const select = document.getElementById('global-lang-select') as HTMLSelectElement | null;
-  if (select) {
-    select.value = savedLang;
-    select.addEventListener('change', (e) => {
+  // Listen to changes from Header selects (desktop & mobile)
+  const selects = document.querySelectorAll<HTMLSelectElement>('.global-lang-select, #global-lang-select, #global-lang-select-mobile');
+  selects.forEach((sel) => {
+    sel.value = savedLang;
+    sel.addEventListener('change', (e) => {
       const newLang = (e.target as HTMLSelectElement).value;
       try {
         localStorage.setItem('site_language', newLang);
@@ -50,7 +52,7 @@ export function initLanguageSystem() {
       applyLanguage(newLang);
       window.dispatchEvent(new CustomEvent('site-language-changed', { detail: { lang: newLang } }));
     });
-  }
+  });
 
   // Listen to site-language-changed events from React QuoteApp / Toolbar
   window.addEventListener('site-language-changed', ((e: CustomEvent<{ lang: string }>) => {

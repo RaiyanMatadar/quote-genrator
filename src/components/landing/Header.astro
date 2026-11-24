@@ -3,20 +3,24 @@
 import { SUPPORTED_LANGUAGES } from '../../data/translations';
 ---
 
-<header class="sticky top-0 z-40 w-full bg-white/80 dark:bg-[#09090b]/80 backdrop-blur-md border-b border-neutral-200/80 dark:border-neutral-800/80 transition-colors no-print">
+<header class="sticky top-0 z-40 w-full bg-white/90 dark:bg-[#09090b]/90 backdrop-blur-md border-b border-neutral-200/80 dark:border-neutral-800/80 transition-colors no-print">
   <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-14 flex items-center justify-between gap-2">
     <!-- Brand -->
-    <a href="/" class="flex items-center gap-1.5 sm:gap-2 group shrink-0">
-      <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-md bg-neutral-900 dark:bg-white flex items-center justify-center text-white dark:text-neutral-900 font-bold text-xs sm:text-sm tracking-tight group-hover:scale-105 transition-transform">
+    <a href="/" class="flex items-center gap-2 group shrink-0 min-w-0">
+      <div class="w-7 h-7 rounded-md bg-neutral-900 dark:bg-white flex items-center justify-center text-white dark:text-neutral-900 font-bold text-xs sm:text-sm tracking-tight group-hover:scale-105 transition-transform shrink-0">
         Q
       </div>
-      <div class="flex items-center gap-1.5">
-        <span data-i18n="brandName" class="font-bold text-xs sm:text-sm tracking-tight text-neutral-950 dark:text-neutral-50 truncate max-w-[130px] sm:max-w-none">Quote Generator Free</span>
-        <span data-i18n="badgeFree" class="hidden sm:inline text-[10px] font-mono uppercase bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 px-1.5 py-0.5 rounded font-medium">Free</span>
+      <div class="flex items-center gap-1.5 min-w-0">
+        <span data-i18n="brandName" class="font-bold text-xs sm:text-sm tracking-tight text-neutral-950 dark:text-neutral-50 truncate max-w-[150px] xs:max-w-[190px] sm:max-w-none">
+          Quote Generator Free
+        </span>
+        <span data-i18n="badgeFree" class="hidden sm:inline text-[10px] font-mono uppercase bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 px-1.5 py-0.5 rounded font-medium shrink-0">
+          Free
+        </span>
       </div>
     </a>
 
-    <!-- Nav Links (Desktop) -->
+    <!-- Nav Links (Desktop: md+) -->
     <nav class="hidden md:flex items-center gap-6 text-xs text-neutral-600 dark:text-neutral-400">
       <a href="#editor" data-i18n="navGenerator" class="hover:text-neutral-950 dark:hover:text-neutral-50 transition-colors">Generator</a>
       <a href="#features" data-i18n="navFeatures" class="hover:text-neutral-950 dark:hover:text-neutral-50 transition-colors">Features</a>
@@ -24,8 +28,8 @@ import { SUPPORTED_LANGUAGES } from '../../data/translations';
       <a href="#faq" data-i18n="navFaq" class="hover:text-neutral-950 dark:hover:text-neutral-50 transition-colors">FAQ</a>
     </nav>
 
-    <!-- Right Controls: Global Language Selector, Theme Toggle & Compact Create Quote Button -->
-    <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+    <!-- Desktop Right Controls (md+) -->
+    <div class="hidden md:flex items-center gap-2.5 shrink-0">
       <!-- Global Website Language Selector -->
       <div class="relative flex items-center">
         <label for="global-lang-select" class="sr-only">Select Website Language</label>
@@ -37,7 +41,7 @@ import { SUPPORTED_LANGUAGES } from '../../data/translations';
             id="global-lang-select"
             aria-label="Select Website Language"
             title="Website Language"
-            class="pl-7 pr-7 py-1 text-[11px] sm:text-xs font-medium text-neutral-700 dark:text-neutral-300 bg-neutral-100/60 dark:bg-neutral-800/60 hover:bg-neutral-100 dark:hover:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-md cursor-pointer transition-colors focus:ring-1 focus:ring-neutral-900 dark:focus:ring-neutral-100"
+            class="global-lang-select pl-7 pr-7 py-1 text-xs font-medium text-neutral-700 dark:text-neutral-300 bg-neutral-100/60 dark:bg-neutral-800/60 hover:bg-neutral-100 dark:hover:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-md cursor-pointer transition-colors focus:ring-1 focus:ring-neutral-900 dark:focus:ring-neutral-100"
           >
             {SUPPORTED_LANGUAGES.map((lang) => (
               <option value={lang.code}>
@@ -50,38 +54,180 @@ import { SUPPORTED_LANGUAGES } from '../../data/translations';
 
       <!-- Dark/Light Theme Toggle -->
       <button
-        id="theme-toggle-btn"
         type="button"
         aria-label="Toggle theme"
         title="Toggle Light/Dark Theme"
-        class="p-1 sm:p-1.5 text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+        class="theme-toggle-btn p-1.5 text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
       >
-        <!-- Sun Icon (shown in dark mode) -->
-        <svg id="theme-sun-icon" class="w-4 h-4 hidden dark:block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg class="theme-sun-icon w-4 h-4 hidden dark:block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
         </svg>
-        <!-- Moon Icon (shown in light mode) -->
-        <svg id="theme-moon-icon" class="w-4 h-4 block dark:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg class="theme-moon-icon w-4 h-4 block dark:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
         </svg>
       </button>
 
-      <!-- Create Quote Button (compact sizing on mobile) -->
+      <!-- Create Quote Button -->
       <a
         href="#editor"
-        class="inline-flex items-center justify-center px-2.5 sm:px-4 py-1 sm:py-1.5 text-[11px] sm:text-xs font-semibold text-white dark:text-neutral-900 bg-neutral-900 dark:bg-white hover:bg-neutral-800 dark:hover:bg-neutral-100 rounded-full transition-colors shadow-2xs whitespace-nowrap leading-none"
+        class="inline-flex items-center justify-center px-4 py-1.5 text-xs font-semibold text-white dark:text-neutral-900 bg-neutral-900 dark:bg-white hover:bg-neutral-800 dark:hover:bg-neutral-100 rounded-full transition-colors shadow-2xs whitespace-nowrap leading-none"
       >
-        <span data-i18n="btnCreateQuote" class="sm:hidden">Create</span>
-        <span data-i18n="btnCreateQuote" class="hidden sm:inline">Create Quote</span>
+        <span data-i18n="btnCreateQuote">Create Quote</span>
+      </a>
+    </div>
+
+    <!-- Mobile Hamburger Button (< md: only Logo + Hamburger icon visible) -->
+    <div class="flex items-center gap-1.5 md:hidden shrink-0">
+      <button
+        id="mobile-menu-toggle-btn"
+        type="button"
+        aria-label="Toggle navigation menu"
+        aria-expanded="false"
+        class="p-2 text-neutral-700 dark:text-neutral-200 hover:text-neutral-950 dark:hover:text-white rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+      >
+        <!-- Hamburger Icon (3 bars) -->
+        <svg id="hamburger-icon" class="w-5 h-5 block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+        <!-- Close Icon (X) -->
+        <svg id="close-icon" class="w-5 h-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Hamburger Drawer / Dropdown Panel -->
+  <div
+    id="mobile-menu"
+    class="hidden md:hidden border-b border-neutral-200 dark:border-neutral-800 bg-white dark:bg-[#09090b] px-4 pt-3 pb-5 space-y-4 shadow-xl transition-all duration-200 ease-out"
+  >
+    <!-- Navigation Links -->
+    <nav class="flex flex-col space-y-1 text-xs font-medium text-neutral-700 dark:text-neutral-300">
+      <a href="#editor" data-i18n="navGenerator" class="mobile-nav-link py-2.5 px-3 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:text-neutral-950 dark:hover:text-white transition-colors">
+        Generator
+      </a>
+      <a href="#features" data-i18n="navFeatures" class="mobile-nav-link py-2.5 px-3 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:text-neutral-950 dark:hover:text-white transition-colors">
+        Features
+      </a>
+      <a href="#templates" data-i18n="navTemplates" class="mobile-nav-link py-2.5 px-3 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:text-neutral-950 dark:hover:text-white transition-colors">
+        Templates
+      </a>
+      <a href="#faq" data-i18n="navFaq" class="mobile-nav-link py-2.5 px-3 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:text-neutral-950 dark:hover:text-white transition-colors">
+        FAQ
+      </a>
+    </nav>
+
+    <!-- Secondary Actions & Controls -->
+    <div class="border-t border-neutral-100 dark:border-neutral-800 pt-3 space-y-3">
+      <!-- Website Language Selector -->
+      <div>
+        <label for="global-lang-select-mobile" class="block text-[11px] font-mono uppercase tracking-wider text-neutral-500 dark:text-neutral-400 font-medium mb-1.5">
+          Website Language
+        </label>
+        <div class="relative flex items-center">
+          <svg class="w-3.5 h-3.5 text-neutral-500 dark:text-neutral-400 pointer-events-none absolute left-3 z-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+          </svg>
+          <select
+            id="global-lang-select-mobile"
+            aria-label="Select Website Language"
+            class="global-lang-select w-full pl-9 pr-8 py-2 text-xs font-medium text-neutral-800 dark:text-neutral-200 bg-neutral-100 dark:bg-neutral-800/80 border border-neutral-200 dark:border-neutral-700 rounded-lg cursor-pointer"
+          >
+            {SUPPORTED_LANGUAGES.map((lang) => (
+              <option value={lang.code}>
+                {lang.nativeName} ({lang.code.toUpperCase()})
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      <!-- Theme Switcher Row -->
+      <div class="flex items-center justify-between py-1 px-1">
+        <span class="text-xs font-medium text-neutral-700 dark:text-neutral-300">
+          Appearance
+        </span>
+        <button
+          type="button"
+          aria-label="Toggle theme"
+          class="theme-toggle-btn p-2 text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white rounded-lg bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 transition-colors"
+        >
+          <svg class="theme-sun-icon w-4 h-4 hidden dark:block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+          <svg class="theme-moon-icon w-4 h-4 block dark:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Create Quote Button -->
+      <a
+        href="#editor"
+        class="mobile-nav-link w-full py-2.5 text-center text-xs font-semibold text-white dark:text-neutral-900 bg-neutral-900 dark:bg-white hover:bg-neutral-800 dark:hover:bg-neutral-100 rounded-lg shadow-sm block transition-colors"
+      >
+        <span data-i18n="btnCreateQuote">Create Quote</span>
       </a>
     </div>
   </div>
 </header>
 
 <script is:inline>
-  const toggleBtn = document.getElementById('theme-toggle-btn');
-  if (toggleBtn) {
-    toggleBtn.addEventListener('click', () => {
+  // Mobile hamburger menu toggle
+  const menuBtn = document.getElementById('mobile-menu-toggle-btn');
+  const mobileMenu = document.getElementById('mobile-menu');
+  const hamburgerIcon = document.getElementById('hamburger-icon');
+  const closeIcon = document.getElementById('close-icon');
+
+  function toggleMobileMenu(open) {
+    if (!mobileMenu || !hamburgerIcon || !closeIcon || !menuBtn) return;
+    const isExpanded = open !== undefined ? open : mobileMenu.classList.contains('hidden');
+    if (isExpanded) {
+      mobileMenu.classList.remove('hidden');
+      hamburgerIcon.classList.add('hidden');
+      closeIcon.classList.remove('hidden');
+      menuBtn.setAttribute('aria-expanded', 'true');
+    } else {
+      mobileMenu.classList.add('hidden');
+      hamburgerIcon.classList.remove('hidden');
+      closeIcon.classList.add('hidden');
+      menuBtn.setAttribute('aria-expanded', 'false');
+    }
+  }
+
+  if (menuBtn && mobileMenu) {
+    menuBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleMobileMenu();
+    });
+
+    // Close when tapping on any navigation link
+    document.querySelectorAll('.mobile-nav-link').forEach((link) => {
+      link.addEventListener('click', () => {
+        toggleMobileMenu(false);
+      });
+    });
+
+    // Close when clicking outside header
+    document.addEventListener('click', (e) => {
+      if (!mobileMenu.contains(e.target) && !menuBtn.contains(e.target)) {
+        toggleMobileMenu(false);
+      }
+    });
+
+    // Close on Escape key
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        toggleMobileMenu(false);
+      }
+    });
+  }
+
+  // Theme toggle buttons (supports both desktop and mobile buttons)
+  const themeButtons = document.querySelectorAll('.theme-toggle-btn');
+  themeButtons.forEach((btn) => {
+    btn.addEventListener('click', () => {
       const isDark = document.documentElement.classList.contains('dark');
       if (isDark) {
         document.documentElement.classList.remove('dark');
@@ -92,5 +238,5 @@ import { SUPPORTED_LANGUAGES } from '../../data/translations';
       }
       window.dispatchEvent(new CustomEvent('theme-changed', { detail: { isDark: !isDark } }));
     });
-  }
+  });
 </script>
