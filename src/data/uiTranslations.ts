@@ -155,8 +155,8 @@ export const SITE_UI_TRANSLATIONS: Record<string, SiteUiDictionary> = {
     btnCreateQuote: 'Create Quote',
 
     heroEyebrow: '100% Free · No Sign-Up · Zero Server Latency',
-    heroHeadline: 'Create Professional Quotations in Seconds.',
-    heroSubtitle: 'A fast, free online quotation generator for freelancers, agencies, and businesses. Add your logo, calculate taxes, customize designer templates, preview in real time, and download high-resolution PDFs instantly.',
+    heroHeadline: 'Free Quote Generator: Create Professional Quotations in Seconds.',
+    heroSubtitle: 'A fast, free online quote generator and quotation generator software for freelancers, contractors, and businesses. Add your logo, calculate taxes, customize designer quote templates, preview in real time, and download high-resolution PDFs instantly.',
     badgeLogoEngine: 'Universal Logo Engine',
     badgePdfPreview: 'Live A4 PDF Preview',
     badgeLanguages: '12+ Languages & Currencies',
