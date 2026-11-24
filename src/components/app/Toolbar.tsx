@@ -102,6 +102,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
     if (onNotify) {
       onNotify('Created new quotation draft', 'info');
     }
+
   };
 
   return (
@@ -239,11 +240,11 @@ export const Toolbar: React.FC<ToolbarProps> = ({
 
       {/* Modern Interactive History Modal with Clickable Cards */}
       {showHistoryModal && (
-        <div 
+        <div
           className="fixed inset-0 z-50 bg-neutral-950/60 backdrop-blur-xs flex items-center justify-center p-4 transition-opacity animate-in fade-in duration-150"
           onClick={() => setShowHistoryModal(false)}
         >
-          <div 
+          <div
             className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 p-5 sm:p-6 max-w-lg w-full shadow-2xl space-y-4 max-h-[85vh] flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
@@ -295,11 +296,10 @@ export const Toolbar: React.FC<ToolbarProps> = ({
                     <div
                       key={draft.id}
                       onClick={() => restoreDraft(draft.id)}
-                      className={`group relative p-3.5 rounded-xl border transition-all duration-150 cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
-                        isActive
+                      className={`group relative p-3.5 rounded-xl border transition-all duration-150 cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${isActive
                           ? 'bg-neutral-50/90 dark:bg-neutral-800/90 border-neutral-900 dark:border-white shadow-xs ring-1 ring-neutral-900/10 dark:ring-white/20'
                           : 'bg-white dark:bg-neutral-900/80 border-neutral-200 dark:border-neutral-800 hover:border-neutral-400 dark:hover:border-neutral-600 hover:shadow-md hover:bg-neutral-50/60 dark:hover:bg-neutral-800/60'
-                      }`}
+                        }`}
                     >
                       {/* Left: Document Info */}
                       <div className="flex items-start gap-3 min-w-0">

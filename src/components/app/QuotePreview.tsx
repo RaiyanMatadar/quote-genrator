@@ -5,17 +5,20 @@ import { CorporateTemplate } from './templates/CorporateTemplate';
 import { CreativeTemplate } from './templates/CreativeTemplate';
 import { NordicTemplate } from './templates/NordicTemplate';
 import { CompactTemplate } from './templates/CompactTemplate';
-import { ZoomIn, ZoomOut, Maximize2 } from 'lucide-react';
+import { ZoomIn, ZoomOut, Maximize2, Expand } from 'lucide-react';
 import type { SiteUiDictionary } from '../../data/uiTranslations';
+import { PdfViewerModal } from './PdfViewerModal';
 
 interface QuotePreviewProps {
   quote: QuoteData;
   ui: SiteUiDictionary;
+  onNotify?: (text: string, type: 'success' | 'error' | 'info') => void;
 }
 
-export const QuotePreview: React.FC<QuotePreviewProps> = ({ quote, ui }) => {
+export const QuotePreview: React.FC<QuotePreviewProps> = ({ quote, ui, onNotify }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [zoomLevel, setZoomLevel] = useState<number>(0.85);
+  const [isFullViewerOpen, setIsFullViewerOpen] = useState<boolean>(false);
   const a4WidthPx = 794; // 210mm at 96 DPI
   const a4HeightPx = 1123; // 297mm
 
@@ -46,17 +49,6 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({ quote, ui }) => {
     }
   };
 
-  // Toggle between Fit and 100% zoom on desktop click
-  const handleDesktopClickZoom = () => {
-    if (window.innerWidth >= 1024) {
-      if (zoomLevel >= 1) {
-        handleFitWidth();
-      } else {
-        setZoomLevel(1);
-      }
-    }
-  };
-
   const renderTemplate = () => {
     switch (quote.branding.templateId) {
       case 'corporate':
@@ -78,7 +70,7 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({ quote, ui }) => {
 
   return (
     <div className="flex flex-col h-full bg-neutral-100 dark:bg-neutral-900/60 rounded-xl border border-neutral-200 dark:border-neutral-800 overflow-hidden shadow-xs transition-colors">
-      {/* Preview Header & Controls (Cleaned: duplicate Print & Download buttons removed) */}
+      {/* Preview Header & Controls */}
       <div className="bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800 px-3 sm:px-4 py-2.5 flex items-center justify-between no-print">
         <div className="flex items-center gap-2">
           <span className="text-xs font-mono font-medium text-neutral-600 dark:text-neutral-300 uppercase tracking-wider">
@@ -89,7 +81,7 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({ quote, ui }) => {
           </span>
         </div>
 
-        {/* Viewport Zoom Controls */}
+        {/* Viewport Zoom & Full-Page Viewer Controls */}
         <div className="flex items-center gap-1 sm:gap-1.5">
           <button
             type="button"
@@ -115,6 +107,19 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({ quote, ui }) => {
           >
             <ZoomIn className="w-3.5 h-3.5" />
           </button>
+
+          <div className="w-px h-4 bg-neutral-200 dark:bg-neutral-700 mx-1" />
+
+          {/* Dedicated Full-Page Google Drive Style Viewer Button */}
+          <button
+            type="button"
+            onClick={() => setIsFullViewerOpen(true)}
+            title="Open Dedicated Full-Screen PDF Viewer"
+            className="px-2.5 py-1 text-xs font-semibold text-neutral-800 dark:text-neutral-200 bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded-md flex items-center gap-1.5 transition-colors shadow-2xs"
+          >
+            <Expand className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Full Viewer</span>
+          </button>
         </div>
       </div>
 
@@ -123,21 +128,25 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({ quote, ui }) => {
         ref={containerRef}
         className="flex-1 overflow-x-auto overflow-y-auto p-2 sm:p-6 flex items-start justify-center min-h-[440px] max-w-full relative group"
       >
-        {/* Desktop Hover Zoom Indicator */}
-        <div className="hidden lg:flex items-center gap-1.5 absolute top-4 right-4 z-20 px-2.5 py-1 rounded-full bg-neutral-900/80 dark:bg-white/90 text-white dark:text-neutral-900 text-[11px] font-mono font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none shadow-md backdrop-blur-xs">
-          <ZoomIn className="w-3 h-3" />
-          <span>{zoomLevel >= 1 ? 'Click to Fit' : 'Click for 100%'}</span>
+        {/* Desktop Hover Zoom / Expand Indicator */}
+        <div 
+          onClick={() => setIsFullViewerOpen(true)}
+          className="hidden lg:flex items-center gap-1.5 absolute top-4 right-4 z-20 px-3 py-1.5 rounded-full bg-neutral-900/85 dark:bg-white/90 text-white dark:text-neutral-900 text-[11px] font-mono font-medium opacity-0 group-hover:opacity-100 transition-all duration-200 shadow-md backdrop-blur-xs cursor-pointer hover:scale-105"
+        >
+          <Expand className="w-3 h-3" />
+          <span>Click to Open Full Viewer</span>
         </div>
 
         {/* Scaled A4 Document Container */}
         <div
-          onClick={handleDesktopClickZoom}
+          onClick={() => setIsFullViewerOpen(true)}
           style={{
             width: `${effectiveWidth}px`,
             height: `${effectiveHeight}px`,
             position: 'relative'
           }}
-          className="shadow-xl rounded-sm print-sheet shrink-0 transition-all duration-150 cursor-default lg:cursor-zoom-in group-hover:ring-2 lg:group-hover:ring-neutral-400/40 dark:lg:group-hover:ring-neutral-600/40"
+          className="shadow-xl rounded-sm print-sheet shrink-0 transition-all duration-150 cursor-pointer group-hover:ring-2 lg:group-hover:ring-neutral-400/50 dark:lg:group-hover:ring-neutral-600/50"
+          title="Click to open Full-Screen Google Drive Viewer"
         >
           <div
             id="quotation-print-target"
@@ -156,6 +165,15 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({ quote, ui }) => {
           </div>
         </div>
       </div>
+
+      {/* Google Drive Style Full-Page PDF Viewer Modal */}
+      <PdfViewerModal
+        isOpen={isFullViewerOpen}
+        onClose={() => setIsFullViewerOpen(false)}
+        quote={quote}
+        ui={ui}
+        onNotify={onNotify}
+      />
     </div>
   );
 };

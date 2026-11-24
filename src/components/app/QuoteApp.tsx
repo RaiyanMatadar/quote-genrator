@@ -172,7 +172,7 @@ export const QuoteApp: React.FC = () => {
             activeTab === 'preview' ? 'block' : 'hidden lg:block'
           }`}
         >
-          <QuotePreview quote={quote} ui={ui} />
+          <QuotePreview quote={quote} ui={ui} onNotify={addToast} />
         </div>
       </div>
 
