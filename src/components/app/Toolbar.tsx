@@ -36,6 +36,13 @@ interface ToolbarProps {
   onNotify?: (text: string, type: 'success' | 'error' | 'info') => void;
 }
 
+// Shared control styles so every element has the same height and look
+const controlBase =
+  'h-9 text-xs rounded-md border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 px-2.5 focus:outline-none focus:ring-2 focus:ring-neutral-900/10 dark:focus:ring-white/20 transition-colors';
+
+const ghostBtn =
+  'h-9 px-2.5 text-xs text-neutral-600 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-md border border-neutral-200 dark:border-neutral-700 flex items-center justify-center gap-1.5 transition-colors';
+
 export const Toolbar: React.FC<ToolbarProps> = ({
   quote,
   ui,
@@ -102,14 +109,13 @@ export const Toolbar: React.FC<ToolbarProps> = ({
     if (onNotify) {
       onNotify('Created new quotation draft', 'info');
     }
-
   };
 
   return (
-    <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-3 shadow-xs space-y-3 no-print transition-colors">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        {/* Left Section: Template, Colors, Currency, Website Language */}
-        <div className="flex flex-wrap items-center gap-2">
+    <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-3 shadow-xs no-print transition-colors">
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        {/* Left: Template, Colors, Currency, Website Language */}
+        <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center">
           {/* Template Selector */}
           <select
             value={quote.branding.templateId}
@@ -120,6 +126,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
               })
             }
             title={ui.template}
+            className={`${controlBase} col-span-2 w-full sm:col-span-1 sm:w-auto`}
           >
             {TEMPLATES.map((tmpl) => (
               <option key={tmpl.id} value={tmpl.id}>
@@ -129,27 +136,30 @@ export const Toolbar: React.FC<ToolbarProps> = ({
           </select>
 
           {/* Accent Color Palette */}
-          <div className="flex items-center gap-1 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-md p-1">
-            <Palette className="w-3.5 h-3.5 text-neutral-400 ml-1 mr-0.5" />
-            {ACCENT_COLORS.map((color) => (
-              <button
-                key={color.id}
-                type="button"
-                onClick={() =>
-                  onChange({
-                    ...quote,
-                    branding: { ...quote.branding, accentColor: color.hex }
-                  })
-                }
-                title={color.name}
-                className="w-4 h-4 rounded-full transition-transform hover:scale-110 flex items-center justify-center shrink-0"
-                style={{ backgroundColor: color.hex }}
-              >
-                {quote.branding.accentColor === color.hex && (
-                  <Check className="w-2.5 h-2.5 text-white stroke-[3]" />
-                )}
-              </button>
-            ))}
+          <div className="col-span-2 h-9 flex items-center justify-between sm:justify-start gap-1.5 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-md px-2.5 sm:col-span-1">
+            <Palette className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
+            <div className="flex items-center gap-1.5">
+              {ACCENT_COLORS.map((color) => (
+                <button
+                  key={color.id}
+                  type="button"
+                  onClick={() =>
+                    onChange({
+                      ...quote,
+                      branding: { ...quote.branding, accentColor: color.hex }
+                    })
+                  }
+                  title={color.name}
+                  aria-label={color.name}
+                  className="w-4 h-4 rounded-full transition-transform hover:scale-110 flex items-center justify-center shrink-0"
+                  style={{ backgroundColor: color.hex }}
+                >
+                  {quote.branding.accentColor === color.hex && (
+                    <Check className="w-2.5 h-2.5 text-white stroke-[3]" />
+                  )}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Currency Selector */}
@@ -157,7 +167,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
             value={quote.currency}
             onChange={(e) => onChange({ ...quote, currency: e.target.value })}
             title={ui.currency}
-            className="font-mono font-medium"
+            className={`${controlBase} w-full sm:w-auto font-mono font-medium`}
           >
             {ALL_CURRENCIES.map((c) => (
               <option key={c.code} value={c.code}>
@@ -171,6 +181,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
             value={siteLanguage}
             onChange={(e) => onSiteLanguageChange(e.target.value)}
             title={ui.websiteLanguage}
+            className={`${controlBase} w-full sm:w-auto`}
           >
             {SUPPORTED_LANGUAGES.map((lang) => (
               <option key={lang.code} value={lang.code}>
@@ -180,25 +191,27 @@ export const Toolbar: React.FC<ToolbarProps> = ({
           </select>
         </div>
 
-        {/* Right Section: Drafts, New, Print & Download */}
-        <div className="flex flex-wrap items-center gap-2">
+        {/* Right: History, New, Print, Download */}
+        <div className="grid grid-cols-[2.25rem_2.25rem_1fr_1fr] gap-2 border-t border-neutral-100 dark:border-neutral-800 pt-3 sm:flex sm:flex-wrap sm:items-center sm:justify-end lg:border-t-0 lg:pt-0">
           {/* History */}
           <button
             type="button"
             onClick={openHistory}
             title={ui.savedDraftsTitle}
-            className="px-2.5 py-1.5 text-xs text-neutral-600 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-md border border-neutral-200 dark:border-neutral-700 flex items-center gap-1 transition-colors"
+            aria-label={ui.btnHistory}
+            className={`${ghostBtn} px-0 sm:px-2.5`}
           >
             <History className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">{ui.btnHistory}</span>
           </button>
 
-          {/* New Quote (Replaced plain window.confirm with ModernModal) */}
+          {/* New Quote */}
           <button
             type="button"
             onClick={() => setShowNewQuoteModal(true)}
             title="Start New Quote"
-            className="px-2.5 py-1.5 text-xs text-neutral-600 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-md border border-neutral-200 dark:border-neutral-700 flex items-center gap-1 transition-colors"
+            aria-label={ui.btnNew}
+            className={`${ghostBtn} px-0 sm:px-2.5`}
           >
             <FilePlus className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">{ui.btnNew}</span>
@@ -208,7 +221,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
           <button
             type="button"
             onClick={printQuote}
-            className="px-3 py-1.5 text-xs font-medium text-neutral-800 dark:text-neutral-200 bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded-md flex items-center gap-1.5 transition-colors"
+            className="h-9 px-3 text-xs font-medium text-neutral-800 dark:text-neutral-200 bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded-md flex items-center justify-center gap-1.5 transition-colors"
           >
             <Printer className="w-3.5 h-3.5" />
             <span>{ui.btnPrint}</span>
@@ -219,7 +232,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
             type="button"
             onClick={handleDownload}
             disabled={isExporting}
-            className="px-4 py-1.5 text-xs font-semibold text-white dark:text-neutral-900 bg-neutral-900 dark:bg-white hover:bg-neutral-800 dark:hover:bg-neutral-100 disabled:opacity-50 rounded-full flex items-center gap-1.5 transition-colors shadow-xs"
+            className="h-9 px-4 text-xs font-semibold text-white dark:text-neutral-900 bg-neutral-900 dark:bg-white hover:bg-neutral-800 dark:hover:bg-neutral-100 disabled:opacity-50 rounded-full flex items-center justify-center gap-1.5 transition-colors shadow-xs whitespace-nowrap"
           >
             <Download className="w-3.5 h-3.5" />
             <span>{isExporting ? ui.generatingPdf : ui.btnDownloadPdf}</span>
@@ -227,7 +240,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
         </div>
       </div>
 
-      {/* Modern Confirmation Modal for New Quote (Replacing window.confirm) */}
+      {/* Confirmation Modal for New Quote */}
       <ModernModal
         isOpen={showNewQuoteModal}
         title="Start a new quotation?"
@@ -238,7 +251,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
         onCancel={() => setShowNewQuoteModal(false)}
       />
 
-      {/* Modern Interactive History Modal with Clickable Cards */}
+      {/* History Modal with Clickable Cards */}
       {showHistoryModal && (
         <div
           className="fixed inset-0 z-50 bg-neutral-950/60 backdrop-blur-xs flex items-center justify-center p-4 transition-opacity animate-in fade-in duration-150"
@@ -269,7 +282,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
               </button>
             </div>
 
-            {/* Clickable Draft Cards List */}
+            {/* Draft Cards List */}
             <div className="overflow-y-auto flex-1 pr-1 space-y-2.5">
               {savedDrafts.length === 0 ? (
                 <div className="py-12 text-center space-y-2.5">
@@ -328,19 +341,23 @@ export const Toolbar: React.FC<ToolbarProps> = ({
                         </div>
                       </div>
 
-                      {/* Right: Total & Interactive Action */}
+                      {/* Right: Total & Actions */}
                       <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-2 shrink-0 border-t sm:border-t-0 pt-2 sm:pt-0 border-neutral-100 dark:border-neutral-800/80">
                         <div className="text-left sm:text-right">
                           <span className="text-[10px] text-neutral-400 uppercase tracking-wider block font-mono">
                             Total
                           </span>
                           <span className="font-mono font-bold text-xs sm:text-sm text-neutral-950 dark:text-white">
-                            {draft.currency} {Number(draft.total || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            {draft.currency}{' '}
+                            {Number(draft.total || 0).toLocaleString(undefined, {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2
+                            })}
                           </span>
                         </div>
                         <div className="flex items-center gap-1.5">
                           <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-semibold bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 group-hover:bg-neutral-900 group-hover:text-white dark:group-hover:bg-white dark:group-hover:text-neutral-900 transition-all">
-                            {isActive ? 'Current' : (ui.openQuote || 'Open Quote')}
+                            {isActive ? 'Current' : ui.openQuote || 'Open Quote'}
                             <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
                           </span>
                           <button
