@@ -1,0 +1,108 @@
+@import "tailwindcss";
+
+@theme {
+  --color-canvas: #fafafa;
+  --color-canvas-elevated: #ffffff;
+  --color-ink: #171717;
+  --color-body: #4d4d4d;
+  --color-mute: #8f8f8f;
+  --color-faint: #a1a1a1;
+  --color-hairline: #ebebeb;
+  --color-hairline-soft: #f2f2f2;
+  --color-link: #0070f3;
+  --color-link-deep: #0761d1;
+  --color-link-soft: #d3e5ff;
+  --color-error: #ee0000;
+  --color-error-deep: #c50000;
+  --color-warning: #f5a623;
+  --color-warning-soft: #ffefcf;
+  --color-warning-deep: #ab570a;
+  --color-violet: #7928ca;
+  --color-violet-soft: #d8ccf1;
+  --color-cyan: #50e3c2;
+  --color-cyan-soft: #aaffec;
+  --color-pink: #ff0080;
+  --color-magenta: #eb367f;
+
+  --font-sans: "Geist Sans", "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-pill-category: 64px;
+  --radius-pill: 100px;
+}
+
+/* Custom Base & Reset */
+html {
+  background-color: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Vercel Mesh Gradient for Hero */
+.hero-mesh-gradient {
+  background: 
+    radial-gradient(circle at 50% 0%, rgba(0, 223, 216, 0.15), transparent 45%),
+    radial-gradient(circle at 20% 20%, rgba(0, 124, 240, 0.12), transparent 40%),
+    radial-gradient(circle at 80% 20%, rgba(121, 40, 202, 0.14), transparent 45%),
+    radial-gradient(circle at 40% 60%, rgba(255, 0, 128, 0.08), transparent 50%),
+    radial-gradient(circle at 70% 50%, rgba(249, 203, 40, 0.1), transparent 40%);
+}
+
+/* Whisper Elevation */
+.elevation-whisper {
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+}
+
+.elevation-floating {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04), 0 8px 16px -4px rgba(0, 0, 0, 0.06);
+}
+
+/* Print Optimization */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Hide interactive non-printable controls */
+  .no-print,
+  nav,
+  footer,
+  .landing-section,
+  .toolbar-container,
+  .editor-pane,
+  .preview-toolbar,
+  .toast-container {
+    display: none !important;
+  }
+
+  /* Make the quotation sheet fill the printable page cleanly */
+  .print-sheet {
+    display: block !important;
+    width: 100% !important;
+    min-height: 100vh !important;
+    box-shadow: none !important;
+    border: none !important;
+    margin: 0 !important;
+    padding: 24mm 20mm !important;
+    background: #ffffff !important;
+  }
+
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}

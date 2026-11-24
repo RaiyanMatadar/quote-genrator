@@ -1,0 +1,28 @@
+---
+// src/components/landing/Footer.astro
+---
+
+<footer class="py-12 bg-white border-t border-neutral-200 text-xs text-neutral-500 no-print">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+    <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+      <div class="flex items-center gap-2">
+        <div class="w-6 h-6 rounded bg-neutral-900 text-white flex items-center justify-center font-bold text-xs">
+          Q
+        </div>
+        <span class="font-bold text-neutral-950 text-sm">Quote Generator Free</span>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-6">
+        <a href="#editor" class="hover:text-neutral-900 transition-colors">Generator</a>
+        <a href="#features" class="hover:text-neutral-900 transition-colors">Features</a>
+        <a href="#faq" class="hover:text-neutral-900 transition-colors">FAQ</a>
+        <a href="https://quotegeneratorfree.com" class="hover:text-neutral-900 transition-colors">quotegeneratorfree.com</a>
+      </div>
+    </div>
+
+    <div class="pt-6 border-t border-neutral-100 flex flex-col sm:flex-row justify-between items-center gap-2 text-[11px] text-neutral-400 font-mono">
+      <p>© {new Date().getFullYear()} Quote Generator Free. 100% Free & Open In-Browser Tool.</p>
+      <p>No cookies · No database storage · Zero tracking</p>
+    </div>
+  </div>
+</footer>
