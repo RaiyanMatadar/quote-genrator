@@ -8,6 +8,7 @@ interface Props {
   canonicalPath?: string;
   keywords?: string;
   breadcrumbTitle?: string;
+  noindex?: boolean;
 }
 
 const {
@@ -15,7 +16,8 @@ const {
   description = "Free quote generator and quotation generator software. Create professional estimates, custom PDF quotes, and sales proposals with our automated quote builder. 100% free.",
   canonicalPath,
   keywords,
-  breadcrumbTitle
+  breadcrumbTitle,
+  noindex = false
 } = Astro.props;
 
 const siteRoot = "https://quotegeneratorfree.com";
@@ -203,7 +205,7 @@ const jsonLd = {
     <meta name="description" content={description} />
     <meta name="keywords" content={seoKeywords} />
     <link rel="canonical" href={canonicalUrl} />
-    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="robots" content={noindex ? "noindex, nofollow" : "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"} />
     <meta name="author" content="Quote Generator Free" />
     <meta name="application-name" content="Quote Generator Free" />
     <meta name="theme-color" content="#09090b" media="(prefers-color-scheme: dark)" />

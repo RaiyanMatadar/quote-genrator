@@ -1,0 +1,80 @@
+---
+// src/pages/404.astro
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/landing/Header.astro';
+import Footer from '../components/landing/Footer.astro';
+---
+
+<Layout
+  title="404: Page Not Found – Quote Generator Free"
+  description="The page you requested could not be found. Return to Quote Generator Free to create professional quotes and estimates."
+  noindex={true}
+>
+  <Header />
+
+  <main class="flex-1 w-full bg-[#fafafa] dark:bg-[#09090b] text-[#171717] dark:text-[#ededed] flex items-center justify-center py-16 sm:py-24 hero-mesh-gradient">
+    <div class="max-w-xl mx-auto px-4 sm:px-6 text-center space-y-8">
+      
+      <!-- Visual Error Code Badge -->
+      <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-mono font-semibold bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 border border-neutral-200 dark:border-neutral-700 shadow-2xs">
+        <span class="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
+        <span>Error 404 · Page Not Found</span>
+      </div>
+
+      <!-- Main Headline -->
+      <div class="space-y-3">
+        <h1 class="text-6xl sm:text-7xl font-black tracking-tight text-neutral-950 dark:text-white font-mono">
+          404
+        </h1>
+        <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">
+          This Page Has Wandered Off
+        </h2>
+        <p class="text-sm sm:text-base text-neutral-600 dark:text-neutral-400 max-w-md mx-auto leading-relaxed">
+          The link you followed may be broken, or the page may have been moved or removed.
+        </p>
+      </div>
+
+      <!-- Primary Action Buttons -->
+      <div class="flex flex-wrap justify-center items-center gap-3 pt-2">
+        <a
+          href="/"
+          class="px-6 py-2.5 rounded-full text-xs sm:text-sm font-semibold bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 hover:bg-neutral-800 dark:hover:bg-neutral-100 transition-colors shadow-sm flex items-center gap-2"
+        >
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+          </svg>
+          <span>Return Home</span>
+        </a>
+
+        <a
+          href="/#editor"
+          class="px-6 py-2.5 rounded-full text-xs sm:text-sm font-semibold border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors flex items-center gap-2"
+        >
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+          </svg>
+          <span>Create a Quote</span>
+        </a>
+      </div>
+
+      <!-- Quick Helpful Navigation Links -->
+      <div class="pt-6 border-t border-neutral-200 dark:border-neutral-800">
+        <p class="text-xs font-mono uppercase tracking-wider text-neutral-400 dark:text-neutral-500 mb-3">
+          Popular Destinations
+        </p>
+        <div class="flex flex-wrap justify-center items-center gap-4 text-xs font-medium text-neutral-600 dark:text-neutral-400">
+          <a href="/about" class="hover:text-neutral-950 dark:hover:text-white transition-colors">About Us</a>
+          <span class="text-neutral-300 dark:text-neutral-700">·</span>
+          <a href="/contact" class="hover:text-neutral-950 dark:hover:text-white transition-colors">Contact Support</a>
+          <span class="text-neutral-300 dark:text-neutral-700">·</span>
+          <a href="/privacy-policy" class="hover:text-neutral-950 dark:hover:text-white transition-colors">Privacy Policy</a>
+          <span class="text-neutral-300 dark:text-neutral-700">·</span>
+          <a href="/terms" class="hover:text-neutral-950 dark:hover:text-white transition-colors">Terms of Service</a>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <Footer />
+</Layout>
