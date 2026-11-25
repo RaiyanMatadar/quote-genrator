@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import type { QuoteData } from '../../types/quote';
 import type { SiteUiDictionary } from '../../data/uiTranslations';
@@ -9,14 +10,11 @@ import { CompactTemplate } from './templates/CompactTemplate';
 import {
   ZoomIn,
   ZoomOut,
-  Maximize2,
   RotateCcw,
   Printer,
   Download,
   X,
   FileText,
-  ChevronLeft,
-  ChevronRight,
   Move
 } from 'lucide-react';
 import { downloadQuotePDF, printQuote } from '../../utils/pdfExporter';
@@ -37,125 +35,154 @@ export const PdfViewerModal: React.FC<PdfViewerModalProps> = ({
   onNotify
 }) => {
   const viewportRef = useRef<HTMLDivElement>(null);
-  const a4WidthPx = 794; // 210mm at 96 DPI
-  const a4HeightPx = 1123; // 297mm
+  const docRef = useRef<HTMLDivElement>(null);
+
+  const a4WidthPx = 794;
+  const a4HeightPx = 1123;
 
   const [scale, setScale] = useState<number>(0.9);
   const [fitScale, setFitScale] = useState<number>(0.9);
-  const [pan, setPan] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
-  const [isDragging, setIsDragging] = useState<boolean>(false);
-  const [isTransitioning, setIsTransitioning] = useState<boolean>(false);
-  const [isExporting, setIsExporting] = useState<boolean>(false);
+  const [pan, setPan] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
 
-  // Drag tracking refs (avoid re-render overhead during high-frequency pointermove)
-  const dragStartRef = useRef<{
-    pointerX: number;
-    pointerY: number;
-    panX: number;
-    panY: number;
-    hasMoved: boolean;
-  }>({ pointerX: 0, pointerY: 0, panX: 0, panY: 0, hasMoved: false });
+  const scaleRef = useRef(scale);
+  const panRef = useRef(pan);
 
-  // Touch pinch tracking refs
-  const pinchRef = useRef<{
-    initialDist: number;
-    initialScale: number;
-    centerX: number;
-    centerY: number;
-  }>({ initialDist: 0, initialScale: 1, centerX: 0, centerY: 0 });
+  scaleRef.current = scale;
+  panRef.current = pan;
 
-  // 1. Clamping function preventing dragging beyond visible boundaries
-  const clampPan = useCallback(
-    (
-      targetX: number,
-      targetY: number,
-      currentScale: number,
-      viewportW: number,
-      viewportH: number
-    ) => {
-      const scaledW = a4WidthPx * currentScale;
-      const scaledH = a4HeightPx * currentScale;
-      const paddingX = viewportW < 640 ? 12 : 48; // Margin around document inside viewer
-      const paddingY = viewportW < 640 ? 24 : 48;
+  const lastWheelTimeRef = useRef(0);
+  const lastSingleClickZoomTimeRef = useRef(0);
 
-      let clampedX = targetX;
-      let clampedY = targetY;
+  const dragStartRef = useRef({
+    pointerX: 0,
+    pointerY: 0,
+    panX: 0,
+    panY: 0,
+    hasMoved: false,
+    clickedPdf: false,
+    pointerType: 'mouse',
+    pointerDownTime: 0
+  });
 
-      // Horizontal containment
-      if (scaledW <= viewportW) {
-        // Document narrower than viewport: Keep centered
-        clampedX = (viewportW - scaledW) / 2;
-      } else {
-        // Document wider than viewport: Clamp so edges don't disappear
-        const minX = viewportW - scaledW - paddingX;
-        const maxX = paddingX;
-        clampedX = Math.min(maxX, Math.max(minX, targetX));
-      }
+  const pinchRef = useRef({
+    initialDist: 0,
+    initialScale: 1,
+    centerX: 0,
+    centerY: 0
+  });
 
-      // Vertical containment
-      if (scaledH <= viewportH) {
-        // Document shorter than viewport: Keep centered
-        clampedY = (viewportH - scaledH) / 2;
-      } else {
-        // Document taller than viewport: Clamp so edges don't disappear
-        const minY = viewportH - scaledH - paddingY;
-        const maxY = paddingY;
-        clampedY = Math.min(maxY, Math.max(minY, targetY));
-      }
+  const isDesktopScreen = useCallback(() => {
+    return typeof window !== 'undefined' && window.innerWidth >= 768;
+  }, []);
 
-      return { x: clampedX, y: clampedY };
-    },
-    []
-  );
+  const getDocHeightPx = useCallback(() => {
+    return Math.max(
+      a4HeightPx,
+      docRef.current?.offsetHeight || a4HeightPx
+    );
+  }, []);
 
-  // 2. Compute initial fit scale on open & resize
+  const clampPan = useCallback((
+    targetX: number,
+    targetY: number,
+    currentScale: number,
+    viewportW: number,
+    viewportH: number
+  ) => {
+    const scaledW = a4WidthPx * currentScale;
+    const scaledH = getDocHeightPx() * currentScale;
+
+    const paddingX = viewportW < 640 ? 12 : 48;
+    const paddingY = viewportW < 640 ? 24 : 48;
+
+    let clampedX = targetX;
+    let clampedY = targetY;
+
+    if (scaledW <= viewportW) {
+      clampedX = (viewportW - scaledW) / 2;
+    } else {
+      const minX = viewportW - scaledW - paddingX;
+      clampedX = Math.min(paddingX, Math.max(minX, targetX));
+    }
+
+    if (scaledH <= viewportH) {
+      clampedY = (viewportH - scaledH) / 2;
+    } else {
+      const minY = viewportH - scaledH - paddingY;
+      clampedY = Math.min(paddingY, Math.max(minY, targetY));
+    }
+
+    return { x: clampedX, y: clampedY };
+  }, [getDocHeightPx]);
+
+  // Initial zoom calculation
   const resetToFit = useCallback(() => {
     if (!viewportRef.current) return;
+
     const vW = viewportRef.current.clientWidth;
     const vH = viewportRef.current.clientHeight;
+    const docHeightPx = getDocHeightPx();
 
-    // Available space accounting for margins and floating toolbar on mobile vs desktop
-    const marginX = vW < 640 ? 16 : 64;
-    const marginY = vW < 640 ? 70 : 120;
+    const isDesktop = window.innerWidth >= 768;
+
+    const marginX = isDesktop ? 96 : 24;
+    const marginY = isDesktop ? 96 : 70;
+    const paddingY = isDesktop ? 48 : 24;
+
     const availableW = Math.max(180, vW - marginX);
     const availableH = Math.max(260, vH - marginY);
 
     const scaleW = availableW / a4WidthPx;
-    const scaleH = availableH / a4HeightPx;
-    // Fit to entire page comfortably (down to 0.25 on small mobile screens)
-    const initialFit = Math.max(0.25, Math.min(1.2, Math.min(scaleW, scaleH)));
-    const roundedFit = Number(initialFit.toFixed(2));
+    const scaleH = availableH / docHeightPx;
+
+    // Desktop: Fit to width, not the entire document height.
+    // Mobile: Continue fitting the complete document into the screen.
+    const initialFit = isDesktop
+      ? Math.min(1.15, scaleW)
+      : Math.min(1.2, scaleW, scaleH);
+
+    const roundedFit = Math.max(
+      0.25,
+      Number(initialFit.toFixed(2))
+    );
 
     setFitScale(roundedFit);
+    scaleRef.current = roundedFit;
     setScale(roundedFit);
 
-    // Center document
-    const centered = clampPan(0, 0, roundedFit, vW, vH);
+    const centered = clampPan(
+      0,
+      paddingY,
+      roundedFit,
+      vW,
+      vH
+    );
+
+    panRef.current = centered;
     setPan(centered);
     setIsTransitioning(true);
-  }, [clampPan]);
+  }, [clampPan, getDocHeightPx]);
 
-  // Recalculate on open and window resize
+  // Open and resize handling
   useEffect(() => {
     if (!isOpen) return;
 
-    // Small delay to ensure modal DOM is mounted and clientWidth/Height are non-zero
-    const timer = setTimeout(() => {
-      resetToFit();
-    }, 30);
+    const timer = setTimeout(resetToFit, 100);
 
-    const handleResize = () => {
-      resetToFit();
-    };
+    const handleResize = () => resetToFit();
 
     window.addEventListener('resize', handleResize);
+
     return () => {
       clearTimeout(timer);
       window.removeEventListener('resize', handleResize);
     };
   }, [isOpen, resetToFit]);
 
-  // 3. Body scroll lock and keyboard shortcuts (Esc, +, -, 0)
+  // Keyboard shortcuts
   useEffect(() => {
     if (!isOpen) return;
 
@@ -178,79 +205,173 @@ export const PdfViewerModal: React.FC<PdfViewerModalProps> = ({
     };
 
     window.addEventListener('keydown', handleKeyDown);
+
     return () => {
       document.body.style.overflow = prevOverflow;
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [isOpen, onClose, resetToFit]);
 
-  // 4. Click-to-Zoom at exact coordinate positioning
-  const zoomToPoint = useCallback(
-    (clientX: number, clientY: number, targetScale: number) => {
-      if (!viewportRef.current) return;
-      const rect = viewportRef.current.getBoundingClientRect();
-      const clickX = clientX - rect.left;
-      const clickY = clientY - rect.top;
+  // Desktop two-finger touchpad scrolling
+  useEffect(() => {
+    if (!isOpen) return;
 
-      // Calculate unscaled document coordinate under click
-      const docX = (clickX - pan.x) / scale;
-      const docY = (clickY - pan.y) / scale;
+    const viewport = viewportRef.current;
+    if (!viewport) return;
 
-      // Calculate target pan keeping clicked point aligned
-      const newPanX = clickX - docX * targetScale;
-      const newPanY = clickY - docY * targetScale;
+    const handleWheel = (e: WheelEvent) => {
+      if (!isDesktopScreen()) return;
 
-      const clamped = clampPan(
-        newPanX,
-        newPanY,
-        targetScale,
-        rect.width,
-        rect.height
-      );
+      e.preventDefault();
 
-      setIsTransitioning(true);
-      setScale(targetScale);
-      setPan(clamped);
-    },
-    [pan, scale, clampPan]
-  );
+      // Ignore trackpad pinch-to-zoom gestures.
+      if (e.ctrlKey) return;
 
+      const vW = viewport.clientWidth;
+      const vH = viewport.clientHeight;
+
+      const multiplier =
+        e.deltaMode === WheelEvent.DOM_DELTA_LINE
+          ? 32
+          : e.deltaMode === WheelEvent.DOM_DELTA_PAGE
+            ? vH
+            : 1;
+
+      const dx = e.deltaX * multiplier;
+      const dy = e.deltaY * multiplier;
+
+      if (dx === 0 && dy === 0) return;
+
+      lastWheelTimeRef.current = performance.now();
+      setIsTransitioning(false);
+
+      setPan(prev => {
+        const clamped = clampPan(
+          prev.x - dx,
+          prev.y - dy,
+          scaleRef.current,
+          vW,
+          vH
+        );
+
+        if (clamped.x === prev.x && clamped.y === prev.y) {
+          return prev;
+        }
+
+        panRef.current = clamped;
+        return clamped;
+      });
+    };
+
+    viewport.addEventListener('wheel', handleWheel, {
+      passive: false
+    });
+
+    return () => {
+      viewport.removeEventListener('wheel', handleWheel);
+    };
+  }, [isOpen, clampPan, isDesktopScreen]);
+
+  // Zoom at clicked position
+  const zoomToPoint = useCallback((
+    clientX: number,
+    clientY: number,
+    targetScale: number
+  ) => {
+    if (!viewportRef.current) return;
+
+    const rect = viewportRef.current.getBoundingClientRect();
+
+    const clickX = clientX - rect.left;
+    const clickY = clientY - rect.top;
+
+    const currentPan = panRef.current;
+    const currentScale = scaleRef.current;
+
+    const docX = (clickX - currentPan.x) / currentScale;
+    const docY = (clickY - currentPan.y) / currentScale;
+
+    const newPanX = clickX - docX * targetScale;
+    const newPanY = clickY - docY * targetScale;
+
+    const clamped = clampPan(
+      newPanX,
+      newPanY,
+      targetScale,
+      rect.width,
+      rect.height
+    );
+
+    setIsTransitioning(true);
+
+    scaleRef.current = targetScale;
+    panRef.current = clamped;
+
+    setScale(targetScale);
+    setPan(clamped);
+  }, [clampPan]);
+
+  // Zoom controls
   const zoomBy = (delta: number) => {
     if (!viewportRef.current) return;
+
     const vW = viewportRef.current.clientWidth;
     const vH = viewportRef.current.clientHeight;
 
-    const nextScale = Math.max(0.25, Math.min(3.5, Number((scale + delta).toFixed(2))));
-    // Center point of viewport as focal point
+    const currentScale = scaleRef.current;
+    const currentPan = panRef.current;
+
+    const nextScale = Math.max(
+      0.25,
+      Math.min(3.5, Number((currentScale + delta).toFixed(2)))
+    );
+
     const centerX = vW / 2;
     const centerY = vH / 2;
 
-    const docX = (centerX - pan.x) / scale;
-    const docY = (centerY - pan.y) / scale;
+    const docX = (centerX - currentPan.x) / currentScale;
+    const docY = (centerY - currentPan.y) / currentScale;
 
     const nextPanX = centerX - docX * nextScale;
     const nextPanY = centerY - docY * nextScale;
 
-    const clamped = clampPan(nextPanX, nextPanY, nextScale, vW, vH);
+    const clamped = clampPan(
+      nextPanX,
+      nextPanY,
+      nextScale,
+      vW,
+      vH
+    );
 
     setIsTransitioning(true);
+
+    scaleRef.current = nextScale;
+    panRef.current = clamped;
+
     setScale(nextScale);
     setPan(clamped);
   };
 
-  // 5. Pointer/Mouse Drag Handlers
+  // Pointer drag
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
-    // Only left click
     if (e.button !== 0) return;
+    if (e.pointerType === 'touch' && !e.isPrimary) return;
+
     dragStartRef.current = {
       pointerX: e.clientX,
       pointerY: e.clientY,
-      panX: pan.x,
-      panY: pan.y,
-      hasMoved: false
+      panX: panRef.current.x,
+      panY: panRef.current.y,
+      hasMoved: false,
+      clickedPdf: Boolean(
+        docRef.current?.contains(e.target as Node)
+      ),
+      pointerType: e.pointerType,
+      pointerDownTime: performance.now()
     };
+
     setIsDragging(true);
-    setIsTransitioning(false); // Immediate 60fps tracking without transition delay
+    setIsTransitioning(false);
   };
 
   const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
@@ -266,72 +387,122 @@ export const PdfViewerModal: React.FC<PdfViewerModalProps> = ({
     const vW = viewportRef.current.clientWidth;
     const vH = viewportRef.current.clientHeight;
 
-    const rawTargetX = dragStartRef.current.panX + dx;
-    const rawTargetY = dragStartRef.current.panY + dy;
+    const clamped = clampPan(
+      dragStartRef.current.panX + dx,
+      dragStartRef.current.panY + dy,
+      scaleRef.current,
+      vW,
+      vH
+    );
 
-    const clamped = clampPan(rawTargetX, rawTargetY, scale, vW, vH);
+    panRef.current = clamped;
     setPan(clamped);
   };
 
   const handlePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
     if (!isDragging) return;
+
     setIsDragging(false);
 
-    // If it was a clean click without dragging, execute Click-to-Zoom
-    if (!dragStartRef.current.hasMoved) {
-      // If at fit scale, zoom in to 1.6x at exact coordinates
-      if (scale <= fitScale * 1.1) {
-        zoomToPoint(e.clientX, e.clientY, 1.6);
-      }
+    const wheelOccurredRecently =
+      lastWheelTimeRef.current >=
+      dragStartRef.current.pointerDownTime - 150;
+
+    if (
+      isDesktopScreen() &&
+      dragStartRef.current.pointerType === 'mouse' &&
+      dragStartRef.current.clickedPdf &&
+      !dragStartRef.current.hasMoved &&
+      !wheelOccurredRecently &&
+      scaleRef.current <= fitScale * 1.1
+    ) {
+      const targetZoom = Math.min(
+        2.5,
+        Math.max(1.6, Number((fitScale * 1.75).toFixed(2)))
+      );
+
+      lastSingleClickZoomTimeRef.current = performance.now();
+
+      zoomToPoint(e.clientX, e.clientY, targetZoom);
     }
   };
 
-  // 6. Double-Click to Zoom In or Reset
+  const handlePointerCancel = () => {
+    setIsDragging(false);
+  };
+
+  // Double click zoom
   const handleDoubleClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
-    if (scale > fitScale * 1.25) {
-      // Already zoomed in: reset back to fit
+
+    if (!isDesktopScreen()) return;
+    if (!docRef.current?.contains(e.target as Node)) return;
+
+    if (performance.now() - lastSingleClickZoomTimeRef.current < 400) {
+      return;
+    }
+
+    if (scaleRef.current > fitScale * 1.25) {
       resetToFit();
     } else {
-      // Zoom in to 2x at exact clicked coordinate
       zoomToPoint(e.clientX, e.clientY, 2.0);
     }
   };
 
-  // 7. Touch Gestures: Pinch-to-Zoom & Pan
+  // Mobile pinch zoom
   const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
     if (e.touches.length === 2) {
+      setIsDragging(false);
+
       const dist = Math.hypot(
         e.touches[0].clientX - e.touches[1].clientX,
         e.touches[0].clientY - e.touches[1].clientY
       );
+
       pinchRef.current = {
         initialDist: dist,
-        initialScale: scale,
+        initialScale: scaleRef.current,
         centerX: (e.touches[0].clientX + e.touches[1].clientX) / 2,
         centerY: (e.touches[0].clientY + e.touches[1].clientY) / 2
       };
+
       setIsTransitioning(false);
     }
   };
 
   const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
     if (e.touches.length === 2 && viewportRef.current) {
-      e.preventDefault(); // Prevent native browser zooming
+      e.preventDefault();
+
       const dist = Math.hypot(
         e.touches[0].clientX - e.touches[1].clientX,
         e.touches[0].clientY - e.touches[1].clientY
       );
+
       if (pinchRef.current.initialDist > 0) {
         const factor = dist / pinchRef.current.initialDist;
+
         const targetScale = Math.max(
           0.25,
-          Math.min(3.5, Number((pinchRef.current.initialScale * factor).toFixed(2)))
+          Math.min(
+            3.5,
+            Number((pinchRef.current.initialScale * factor).toFixed(2))
+          )
         );
 
         const vW = viewportRef.current.clientWidth;
         const vH = viewportRef.current.clientHeight;
-        const clamped = clampPan(pan.x, pan.y, targetScale, vW, vH);
+
+        const clamped = clampPan(
+          panRef.current.x,
+          panRef.current.y,
+          targetScale,
+          vW,
+          vH
+        );
+
+        scaleRef.current = targetScale;
+        panRef.current = clamped;
 
         setScale(targetScale);
         setPan(clamped);
@@ -343,18 +514,22 @@ export const PdfViewerModal: React.FC<PdfViewerModalProps> = ({
     pinchRef.current.initialDist = 0;
   };
 
-  // 8. PDF Download within Viewer
+  // Download PDF
   const handleDownloadFromViewer = async () => {
     setIsExporting(true);
+
     try {
-      await downloadQuotePDF('quotation-print-target', quote.meta.quoteNumber);
-      if (onNotify) {
-        onNotify('PDF downloaded successfully!', 'success');
-      }
+      await downloadQuotePDF(
+        'quotation-print-target',
+        quote.meta.quoteNumber
+      );
+
+      onNotify?.('PDF downloaded successfully!', 'success');
     } catch (err: any) {
-      if (onNotify) {
-        onNotify(`Download failed: ${err.message || 'Error'}`, 'error');
-      }
+      onNotify?.(
+        `Download failed: ${err.message || 'Error'}`,
+        'error'
+      );
     } finally {
       setIsExporting(false);
     }
@@ -387,9 +562,8 @@ export const PdfViewerModal: React.FC<PdfViewerModalProps> = ({
       aria-label="Full-Page PDF Viewer"
       className="fixed inset-0 z-50 bg-[#1e1f20]/95 backdrop-blur-md flex flex-col select-none text-white animate-in fade-in duration-150"
     >
-      {/* Top Bar (Google Drive Style) */}
+      {/* Top Bar */}
       <header className="h-14 bg-[#1e1f20] border-b border-white/10 px-3 sm:px-6 flex items-center justify-between gap-2 shrink-0 z-30 shadow-md">
-        {/* Left: Document Info & Close */}
         <div className="flex items-center gap-3 min-w-0">
           <button
             type="button"
@@ -399,14 +573,17 @@ export const PdfViewerModal: React.FC<PdfViewerModalProps> = ({
           >
             <X className="w-5 h-5" />
           </button>
+
           <div className="flex items-center gap-2 truncate">
             <div className="p-1.5 rounded-md bg-neutral-800 text-neutral-300 shrink-0">
               <FileText className="w-4 h-4" />
             </div>
+
             <div className="truncate">
               <h2 className="text-xs sm:text-sm font-semibold truncate leading-tight">
                 {quote.meta.quoteNumber || 'Quotation'}
               </h2>
+
               <p className="text-[10px] text-neutral-400 font-mono truncate">
                 {quote.meta.title || 'QUOTE'} · {quote.to.name || 'Client Draft'}
               </p>
@@ -414,14 +591,12 @@ export const PdfViewerModal: React.FC<PdfViewerModalProps> = ({
           </div>
         </div>
 
-        {/* Center: Zoom & Navigation Controls Pill */}
+        {/* Desktop Zoom Controls */}
         <div className="hidden md:flex items-center gap-1 bg-[#28292a] border border-white/10 px-3 py-1 rounded-full shadow-inner text-xs">
-          {/* Page Indicator */}
           <div className="flex items-center gap-1 text-[11px] font-mono text-neutral-400 pr-2 border-r border-white/10">
             <span>1 / 1</span>
           </div>
 
-          {/* Zoom Out */}
           <button
             type="button"
             onClick={() => zoomBy(-0.15)}
@@ -431,12 +606,10 @@ export const PdfViewerModal: React.FC<PdfViewerModalProps> = ({
             <ZoomOut className="w-4 h-4" />
           </button>
 
-          {/* Zoom Percentage Display */}
           <span className="w-14 text-center font-mono text-[11px] font-semibold text-neutral-200">
             {Math.round(scale * 100)}%
           </span>
 
-          {/* Zoom In */}
           <button
             type="button"
             onClick={() => zoomBy(0.15)}
@@ -448,7 +621,6 @@ export const PdfViewerModal: React.FC<PdfViewerModalProps> = ({
 
           <div className="w-px h-4 bg-white/10 mx-1" />
 
-          {/* Reset / Fit to Page */}
           <button
             type="button"
             onClick={resetToFit}
@@ -460,9 +632,8 @@ export const PdfViewerModal: React.FC<PdfViewerModalProps> = ({
           </button>
         </div>
 
-        {/* Right: Actions (Print, Download, Close) */}
+        {/* Actions */}
         <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-          {/* Print */}
           <button
             type="button"
             onClick={printQuote}
@@ -472,7 +643,6 @@ export const PdfViewerModal: React.FC<PdfViewerModalProps> = ({
             <Printer className="w-4 h-4" />
           </button>
 
-          {/* Download PDF */}
           <button
             type="button"
             onClick={handleDownloadFromViewer}
@@ -482,33 +652,34 @@ export const PdfViewerModal: React.FC<PdfViewerModalProps> = ({
           >
             <Download className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">
-              {isExporting ? ui.generatingPdf || 'Generating...' : ui.btnDownloadPdf || 'Download'}
+              {isExporting
+                ? ui.generatingPdf || 'Generating...'
+                : ui.btnDownloadPdf || 'Download'}
             </span>
           </button>
         </div>
       </header>
 
-      {/* Main Interactive Viewer Viewport */}
+      {/* Main Viewer */}
       <main
         ref={viewportRef}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
+        onPointerCancel={handlePointerCancel}
         onDoubleClick={handleDoubleClick}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
         className={`flex-1 relative overflow-hidden flex items-start justify-start select-none touch-none ${isDragging
-          ? 'cursor-grabbing'
-          : isZoomedIn
-            ? 'cursor-grab'
-            : 'cursor-zoom-in'
+            ? 'cursor-grabbing'
+            : isZoomedIn
+              ? 'cursor-grab'
+              : 'cursor-zoom-in'
           }`}
       >
-        {/* Floating Controls for Mobile (<md) */}
+        {/* Mobile Controls */}
         <div className="md:hidden absolute bottom-4 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 bg-[#28292a]/95 border border-white/15 px-3 py-1.5 rounded-full shadow-2xl backdrop-blur-md">
-
-          {/* Zoom Out */}
           <button
             type="button"
             onClick={() => zoomBy(-0.15)}
@@ -518,12 +689,10 @@ export const PdfViewerModal: React.FC<PdfViewerModalProps> = ({
             <ZoomOut className="w-4 h-4" />
           </button>
 
-          {/* Zoom Percentage */}
           <span className="font-mono text-xs font-semibold px-1">
             {Math.round(scale * 100)}%
           </span>
 
-          {/* Zoom In */}
           <button
             type="button"
             onClick={() => zoomBy(0.15)}
@@ -535,7 +704,6 @@ export const PdfViewerModal: React.FC<PdfViewerModalProps> = ({
 
           <div className="w-px h-3.5 bg-white/20" />
 
-          {/* Fit to Screen */}
           <button
             type="button"
             onClick={resetToFit}
@@ -547,27 +715,44 @@ export const PdfViewerModal: React.FC<PdfViewerModalProps> = ({
 
           <div className="w-px h-3.5 bg-white/20" />
 
-          {/* Close PDF Viewer */}
           <button
             type="button"
             onClick={onClose}
             title="Close PDF viewer"
             aria-label="Close PDF viewer"
-            className="p-1.5 text-neutral-300 hover:text-red-400 hover:bg-white/10 rounded-full transition-colors"
+            className="p-1.5 text-red-500 hover:text-white hover:bg-red-600 rounded-full transition-colors"
           >
-            <X className="p-1.5 text-red-500 hover:text-white hover:bg-red-600 rounded-full transition-colors" />
+            <X className="w-4 h-4" />
           </button>
-
         </div>
 
-        {/* Floating Hint Overlay (Auto fades) */}
-        <div className="hidden lg:flex items-center gap-2 absolute bottom-4 right-4 z-20 px-3 py-1.5 rounded-full bg-black/60 text-neutral-400 text-[11px] font-mono pointer-events-none backdrop-blur-xs border border-white/5">
-          <Move className="w-3 h-3 text-neutral-300" />
-          <span>Double-click to zoom · Drag to pan · Esc to exit</span>
+        {/* Improved Desktop Interaction Hint */}
+        <div className="hidden lg:flex items-center gap-3 absolute bottom-5 right-5 z-20 px-4 py-2.5 rounded-xl bg-black/70 text-neutral-300 text-[11px] pointer-events-none backdrop-blur-md border border-white/10 shadow-lg">
+          <span className="flex items-center gap-1.5">
+            <ZoomIn className="w-3.5 h-3.5 text-white" />
+            Click to zoom
+          </span>
+
+          <span className="text-neutral-600">|</span>
+
+          <span className="flex items-center gap-1.5">
+            <Move className="w-3.5 h-3.5 text-white" />
+            Drag to pan
+          </span>
+
+          <span className="text-neutral-600">|</span>
+
+          <span>Two-finger scroll</span>
+
+          <span className="text-neutral-600">|</span>
+
+          <span className="font-semibold text-white">Esc to close</span>
         </div>
 
-        {/* Scaled A4 Document Canvas */}
+        {/* PDF Document */}
         <div
+          ref={docRef}
+          onDragStart={e => e.preventDefault()}
           style={{
             transform: `translate3d(${pan.x}px, ${pan.y}px, 0px) scale(${scale})`,
             transformOrigin: '0 0',
