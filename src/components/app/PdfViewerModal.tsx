@@ -498,41 +498,66 @@ export const PdfViewerModal: React.FC<PdfViewerModalProps> = ({
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
-        className={`flex-1 relative overflow-hidden flex items-start justify-start select-none touch-none ${
-          isDragging
-            ? 'cursor-grabbing'
-            : isZoomedIn
+        className={`flex-1 relative overflow-hidden flex items-start justify-start select-none touch-none ${isDragging
+          ? 'cursor-grabbing'
+          : isZoomedIn
             ? 'cursor-grab'
             : 'cursor-zoom-in'
-        }`}
+          }`}
       >
         {/* Floating Controls for Mobile (<md) */}
         <div className="md:hidden absolute bottom-4 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 bg-[#28292a]/95 border border-white/15 px-3 py-1.5 rounded-full shadow-2xl backdrop-blur-md">
+
+          {/* Zoom Out */}
           <button
             type="button"
             onClick={() => zoomBy(-0.15)}
-            className="p-1.5 text-neutral-300 hover:text-white rounded-full"
+            title="Zoom out"
+            className="p-1.5 text-neutral-300 hover:text-white rounded-full transition-colors"
           >
             <ZoomOut className="w-4 h-4" />
           </button>
+
+          {/* Zoom Percentage */}
           <span className="font-mono text-xs font-semibold px-1">
             {Math.round(scale * 100)}%
           </span>
+
+          {/* Zoom In */}
           <button
             type="button"
             onClick={() => zoomBy(0.15)}
-            className="p-1.5 text-neutral-300 hover:text-white rounded-full"
+            title="Zoom in"
+            className="p-1.5 text-neutral-300 hover:text-white rounded-full transition-colors"
           >
             <ZoomIn className="w-4 h-4" />
           </button>
+
           <div className="w-px h-3.5 bg-white/20" />
+
+          {/* Fit to Screen */}
           <button
             type="button"
             onClick={resetToFit}
-            className="p-1 text-neutral-300 hover:text-white"
+            title="Fit to screen"
+            className="p-1 text-neutral-300 hover:text-white rounded-full transition-colors"
           >
             <RotateCcw className="w-3.5 h-3.5" />
           </button>
+
+          <div className="w-px h-3.5 bg-white/20" />
+
+          {/* Close PDF Viewer */}
+          <button
+            type="button"
+            onClick={onClose}
+            title="Close PDF viewer"
+            aria-label="Close PDF viewer"
+            className="p-1.5 text-neutral-300 hover:text-red-400 hover:bg-white/10 rounded-full transition-colors"
+          >
+            <X className="p-1.5 text-red-500 hover:text-white hover:bg-red-600 rounded-full transition-colors" />
+          </button>
+
         </div>
 
         {/* Floating Hint Overlay (Auto fades) */}
